@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Calculators - College Materials & PYQs Portal{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="bg-light py-2">
+    <div class="container">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Calculators</li>
+        </ol>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <h1 class="display-5 mb-2">
+                    <i class="fas fa-calculator text-primary me-3"></i>
+                    Academic Calculators
+                </h1>
+                <p class="text-muted lead">Essential tools for calculating GPA, CGPA, percentage, and internal marks</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- GPA Calculator -->
+    <div class="col-lg-6 col-md-12">
+        <div class="card h-100 shadow-sm hover-card">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-start">
+                    <div class="bg-primary bg-opacity-10 rounded p-3 me-3">
+                        <i class="fas fa-graduation-cap fa-2x text-primary"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h4 class="card-title mb-2 text-primary">GPA Calculator</h4>
+                        <p class="card-text text-muted mb-3">
+                            Calculate Grade Point Average for individual semesters. Input subjects with grades and credits to get your semester GPA.
+                        </p>
+                        <a href="{{ url_for('gpa_calculator') }}" class="btn btn-primary">
+                            <i class="fas fa-arrow-right me-2"></i>Calculate GPA
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CGPA Calculator -->
+    <div class="col-lg-6 col-md-12">
+        <div class="card h-100 shadow-sm hover-card">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-start">
+                    <div class="bg-success bg-opacity-10 rounded p-3 me-3">
+                        <i class="fas fa-chart-line fa-2x text-success"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h4 class="card-title mb-2 text-success">CGPA Calculator</h4>
+                        <p class="card-text text-muted mb-3">
+                            Calculate Cumulative Grade Point Average across multiple semesters. Input GPA and credits for each semester.
+                        </p>
+                        <a href="{{ url_for('cgpa_calculator') }}" class="btn btn-success">
+                            <i class="fas fa-arrow-right me-2"></i>Calculate CGPA
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Percentage Calculator -->
+    <div class="col-lg-6 col-md-12">
+        <div class="card h-100 shadow-sm hover-card">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-start">
+                    <div class="bg-warning bg-opacity-10 rounded p-3 me-3">
+                        <i class="fas fa-percentage fa-2x text-warning"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h4 class="card-title mb-2 text-warning">Percentage Calculator</h4>
+                        <p class="card-text text-muted mb-3">
+                            Convert GPA or CGPA to percentage using the standard formula. Quick and accurate conversion tool.
+                        </p>
+                        <a href="{{ url_for('percentage_calculator') }}" class="btn btn-warning">
+                            <i class="fas fa-arrow-right me-2"></i>Calculate Percentage
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Internal Marks Calculator -->
+    <div class="col-lg-6 col-md-12">
+        <div class="card h-100 shadow-sm hover-card">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-start">
+                    <div class="bg-info bg-opacity-10 rounded p-3 me-3">
+                        <i class="fas fa-clipboard-list fa-2x text-info"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h4 class="card-title mb-2 text-info">Internal Marks Calculator</h4>
+                        <p class="card-text text-muted mb-3">
+                            Calculate internal assessment marks from CAT, SAT, assignments, and viva scores. Handles AB grades automatically.
+                        </p>
+                        <a href="{{ url_for('internal_calculator') }}" class="btn btn-info">
+                            <i class="fas fa-arrow-right me-2"></i>Calculate Internal Marks
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.hover-card {
+    transition: all 0.3s ease-in-out;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+}
+</style>
+{% endblock %}

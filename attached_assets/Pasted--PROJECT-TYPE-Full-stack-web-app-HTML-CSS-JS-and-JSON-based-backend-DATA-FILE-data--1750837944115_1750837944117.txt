@@ -1,0 +1,70 @@
+👨‍💻 PROJECT TYPE: Full-stack web app (HTML, CSS, JS, and JSON-based backend)
+📁 DATA FILE: `data.json`
+🗃️ STORAGE METHOD: JSON only (no database)
+🌐 CONTEXT: SSN students' file-sharing portal – CAT Files (like shown in the screenshot)
+
+🔧 TASK: Add the following features to the file listing system:
+
+------------------
+🎯 FEATURES TO IMPLEMENT:
+------------------
+
+1️⃣ 👍 Like & 👎 Dislike:
+- Add Like and Dislike buttons under each file.
+- Store values in `data.json` like:
+  "likes": 0,
+  "dislikes": 0
+- When clicked:
+  - Increment the count.
+  - Prevent multiple votes per user using localStorage or sessionStorage.
+  - Display current like/dislike count beside the buttons.
+
+2️⃣ 💬 Comments Section:
+- Add collapsible comment area under each file.
+- Inputs: Name and Comment Text.
+- Store in `data.json` like:
+  "comments": [
+    {"name": "User1", "comment": "Very useful notes!", "date": "2025-06-20 14:30"}
+  ]
+- Show newest comments on top.
+
+3️⃣ 📝 Description Field:
+- Add a "Description" textarea in the file upload form.
+- Store it in `data.json` like:
+  "description": "This file explains scientific Tamil terminology used in tech."
+- On file listing, display description in a stylized box (like YouTube video descriptions).
+- If no description is available, hide the section.
+
+4️⃣ 🔗 Share Button:
+- Add a "Share" button next to each file.
+- When clicked:
+  - Copy the file’s public download link to the clipboard.
+  - Show toast message: “Link copied!”
+- Example URL format:
+  `https://replit.dev/download/uploads/Development_of_scientific_tamil.docx`
+
+5️⃣ 📦 JSON Storage Only:
+- All metadata (likes, dislikes, comments, descriptions) must be read from and written to `data.json`.
+- No SQL or external database.
+- Keep code modular and responsive (works on mobile & desktop).
+- Use vanilla JS or a lightweight framework like Alpine.js if needed.
+- Ensure UI remains clean and collapsible for better UX.
+
+📂 Sample JSON structure:
+```json
+{
+  "files": [
+    {
+      "name": "Development_of_scientific_tamil.docx",
+      "subject": "tamil and technology",
+      "size": "58.0 KB",
+      "uploadDate": "2025-06-20 14:25:01",
+      "likes": 0,
+      "dislikes": 0,
+      "description": "This file contains insights into the development of scientific Tamil.",
+      "comments": [
+        {"name": "Arun", "comment": "Very helpful!", "date": "2025-06-20 14:30"}
+      ]
+    }
+  ]
+}

@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+
+{% block title %}Add Club - College Materials & PYQs Portal{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <h2 class="text-primary mb-2">
+                    <i class="fas fa-plus-circle me-2"></i>Add New Student Club
+                </h2>
+                <p class="text-muted">Create a new club entry for the student portal</p>
+            </div>
+
+            <!-- Form Card -->
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-users me-2"></i>Club Information
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" enctype="multipart/form-data" id="addClubForm">
+                        <!-- Club Name -->
+                        <div class="mb-3">
+                            <label for="club_name" class="form-label fw-bold">
+                                Club Name <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="club_name" 
+                                   name="club_name" 
+                                   required 
+                                   placeholder="Enter club name"
+                                   maxlength="100">
+                            <div class="form-text">Maximum 100 characters</div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-3">
+                            <label for="description" class="form-label fw-bold">
+                                Description <span class="text-muted">(Optional)</span>
+                            </label>
+                            <textarea class="form-control" 
+                                      id="description" 
+                                      name="description" 
+                                      rows="4" 
+                                      placeholder="Brief description of the club's activities and purpose"
+                                      maxlength="500"></textarea>
+                            <div class="form-text">Maximum 500 characters</div>
+                        </div>
+
+                        <!-- Instagram Link -->
+                        <div class="mb-3">
+                            <label for="instagram_link" class="form-label fw-bold">
+                                Instagram Link <span class="text-muted">(Optional)</span>
+                            </label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fab fa-instagram text-primary"></i>
+                                </span>
+                                <input type="url" 
+                                       class="form-control" 
+                                       id="instagram_link" 
+                                       name="instagram_link" 
+                                       placeholder="https://instagram.com/your_club">
+                            </div>
+                            <div class="form-text">Full Instagram profile URL</div>
+                        </div>
+
+                        <!-- Instagram Screenshot -->
+                        <div class="mb-4">
+                            <label for="instagram_screenshot" class="form-label fw-bold">
+                                Instagram Screenshot <span class="text-muted">(Optional)</span>
+                            </label>
+                            <div class="upload-area border-2 border-dashed border-primary rounded p-4 text-center" id="uploadArea">
+                                <input type="file" 
+                                       class="form-control" 
+                                       id="instagram_screenshot" 
+                                       name="instagram_screenshot" 
+                                       accept="image/*"
+                                       style="display: none;">
+                                <div id="uploadContent">
+                                    <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
+                                    <h6 class="mb-2">Click to upload or drag and drop</h6>
+                                    <p class="text-muted mb-0">PNG, JPG, JPEG, GIF up to 10MB</p>
+                                </div>
+                                <div id="previewArea" style="display: none;">
+                                    <img id="imagePreview" src="" alt="Preview" class="img-fluid rounded mb-2" style="max-height: 200px;">
+                                    <div>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeImage()">
+                                            <i class="fas fa-trash me-1"></i>Remove
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-text">Upload a screenshot of the club's Instagram profile or posts</div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('clubs') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Clubs
+                            </a>
+                            <div>
+                                <button type="reset" class="btn btn-outline-warning me-2">
+                                    <i class="fas fa-undo me-2"></i>Reset
+                                </button>
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-save me-2"></i>Add Club
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="notification-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <i class="fas fa-info-circle text-primary me-2"></i>
+            <strong class="me-auto">Notification</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="toast-message"></div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('instagram_screenshot');
+    const uploadContent = document.getElementById('uploadContent');
+    const previewArea = document.getElementById('previewArea');
+    const imagePreview = document.getElementById('imagePreview');
+    
+    // Click to upload
+    uploadArea.addEventListener('click', function() {
+        if (previewArea.style.display === 'none') {
+            fileInput.click();
+        }
+    });
+    
+    // Drag and drop functionality
+    uploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        uploadArea.classList.add('border-success');
+    });
+    
+    uploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        uploadArea.classList.remove('border-success');
+    });
+    
+    uploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        uploadArea.classList.remove('border-success');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            handleFileSelect(files[0]);
+        }
+    });
+    
+    // File input change
+    fileInput.addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+            handleFileSelect(e.target.files[0]);
+        }
+    });
+    
+    function handleFileSelect(file) {
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            showToast('Please select an image file.', 'error');
+            return;
+        }
+        
+        // Validate file size (10MB)
+        if (file.size > 10 * 1024 * 1024) {
+            showToast('File size must be less than 10MB.', 'error');
+            return;
+        }
+        
+        // Show preview
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            imagePreview.src = e.target.result;
+            uploadContent.style.display = 'none';
+            previewArea.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+        
+        // Update file input
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        fileInput.files = dataTransfer.files;
+    }
+    
+    // Character counters
+    const clubNameInput = document.getElementById('club_name');
+    const descriptionInput = document.getElementById('description');
+    
+    if (clubNameInput) {
+        clubNameInput.addEventListener('input', function() {
+            const remaining = 100 - this.value.length;
+            this.nextElementSibling.textContent = `${remaining} characters remaining`;
+        });
+    }
+    
+    if (descriptionInput) {
+        descriptionInput.addEventListener('input', function() {
+            const remaining = 500 - this.value.length;
+            this.nextElementSibling.textContent = `${remaining} characters remaining`;
+        });
+    }
+    
+    // Form validation
+    document.getElementById('addClubForm').addEventListener('submit', function(e) {
+        const clubName = document.getElementById('club_name').value.trim();
+        
+        if (!clubName) {
+            e.preventDefault();
+            showToast('Club name is required.', 'error');
+            return;
+        }
+        
+        // Show loading state
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Adding Club...';
+        submitBtn.disabled = true;
+        
+        // Re-enable if form submission fails
+        setTimeout(() => {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }, 5000);
+    });
+});
+
+// Remove image function
+function removeImage() {
+    const uploadContent = document.getElementById('uploadContent');
+    const previewArea = document.getElementById('previewArea');
+    const fileInput = document.getElementById('instagram_screenshot');
+    
+    uploadContent.style.display = 'block';
+    previewArea.style.display = 'none';
+    fileInput.value = '';
+}
+
+// Show toast notification
+function showToast(message, type = 'success') {
+    const toastElement = document.getElementById('notification-toast');
+    const toastMessage = document.getElementById('toast-message');
+    
+    toastMessage.textContent = message;
+    
+    if (type === 'error') {
+        toastElement.className = 'toast bg-danger text-white';
+    } else {
+        toastElement.className = 'toast';
+    }
+    
+    const toast = new bootstrap.Toast(toastElement);
+    toast.show();
+}
+</script>
+
+<style>
+.upload-area {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+}
+
+.upload-area:hover {
+    background-color: #e9ecef;
+    border-color: #0056b3 !important;
+}
+
+.upload-area.border-success {
+    border-color: #28a745 !important;
+    background-color: #d4edda;
+}
+
+#previewArea img {
+    max-width: 100%;
+    border: 2px solid #dee2e6;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.btn:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+</style>
+{% endblock %}

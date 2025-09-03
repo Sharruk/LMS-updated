@@ -1,0 +1,15 @@
+{
+  "events": [
+    {
+      "id": 1,
+      "name": "Invente 2025",
+      "description": "",
+      "event_datetime": "2025-07-22T09:30:00",
+      "category": "Cultural Fest",
+      "registration_link": "",
+      "poster_filename": null,
+      "date_added": "2025-06-30T17:31:20.243905"
+    }
+  ],
+  "next_id": 2
+}

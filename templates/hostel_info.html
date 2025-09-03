@@ -1,0 +1,452 @@
+{% extends "base.html" %}
+
+{% block title %}Hostel Information{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-warning text-dark">
+                <div class="card-body text-center">
+                    <h1 class="card-title mb-3">
+                        <i class="fas fa-building me-3"></i>Hostel Information
+                    </h1>
+                    <p class="card-text lead">
+                        Get complete details of SSN Hostels for students and parents.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Hostel Button -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <button type="button" class="btn btn-success btn-lg" id="addHostelBtn" onclick="toggleAddForm()">
+                <i class="fas fa-plus me-2"></i>+ Add Hostel
+            </button>
+        </div>
+    </div>
+
+    <!-- Add Hostel Form (Hidden by default) -->
+    <div class="row mb-4" id="addHostelForm" style="display: none;">
+        <div class="col-12">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-plus me-2"></i>Add New Hostel Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('add_hostel') }}" method="post" enctype="multipart/form-data" id="hostelForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="hostel_name" class="form-label">Hostel Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="hostel_name" name="hostel_name" 
+                                       placeholder="e.g., Hostel Block A, Girls Hostel" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="hostel_category" class="form-label">Hostel Category <span class="text-danger">*</span></label>
+                                <select class="form-select" id="hostel_category" name="hostel_category" required>
+                                    <option value="">Select Category</option>
+                                    <option value="Boys">Boys</option>
+                                    <option value="Girls">Girls</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="hostel_photo" class="form-label">Hostel Photo <span class="text-danger">*</span></label>
+                            <input type="file" class="form-control" id="hostel_photo" name="hostel_photo" 
+                                   accept=".jpg,.jpeg,.png" required>
+                            <div class="form-text">Supported formats: JPG, PNG (At least one photo required)</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="hostel_description" class="form-label">Description (Optional)</label>
+                            <textarea class="form-control" id="hostel_description" name="hostel_description" rows="3" 
+                                      placeholder="Brief description about this hostel..."></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="maps_link" class="form-label">Google Maps Location Link (Optional)</label>
+                            <input type="url" class="form-control" id="maps_link" name="maps_link" 
+                                   placeholder="https://maps.google.com/...">
+                            <div class="form-text">Direct link to the hostel location on Google Maps</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Facilities Available</label>
+                            <div class="row">
+                                <div class="col-md-4 col-sm-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="Mess" id="facility_mess" name="facilities">
+                                        <label class="form-check-label" for="facility_mess">
+                                            <i class="fas fa-utensils me-1"></i> Mess
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="Canteen" id="facility_canteen" name="facilities">
+                                        <label class="form-check-label" for="facility_canteen">
+                                            <i class="fas fa-coffee me-1"></i> Canteen
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="Wifi" id="facility_wifi" name="facilities">
+                                        <label class="form-check-label" for="facility_wifi">
+                                            <i class="fas fa-wifi me-1"></i> Wifi
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="Study Room" id="facility_study" name="facilities">
+                                        <label class="form-check-label" for="facility_study">
+                                            <i class="fas fa-book me-1"></i> Study Room
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="Sports Area" id="facility_sports" name="facilities">
+                                        <label class="form-check-label" for="facility_sports">
+                                            <i class="fas fa-football-ball me-1"></i> Sports Area
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-sm-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="Gym" id="facility_gym" name="facilities">
+                                        <label class="form-check-label" for="facility_gym">
+                                            <i class="fas fa-dumbbell me-1"></i> Gym
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="basic_rules" class="form-label">Basic Rules (Optional)</label>
+                            <textarea class="form-control" id="basic_rules" name="basic_rules" rows="4" 
+                                      placeholder="Timings, visitor policy, and other important rules..."></textarea>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success" id="submitBtn">
+                                <i class="fas fa-plus me-2"></i>Add Hostel
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="toggleAddForm()">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hostels Display -->
+    <div class="row">
+        <div class="col-12">
+            {% if hostels %}
+                <h3 class="mb-4">
+                    <i class="fas fa-building me-2"></i>SSN Hostels 
+                    <span class="badge bg-warning text-dark">{{ hostels|length }}</span>
+                </h3>
+                
+                <div class="row">
+                    {% for hostel in hostels %}
+                    <div class="col-lg-6 col-md-12 mb-4">
+                        <div class="card h-100 shadow-sm hover-card">
+                            <!-- Hostel Photo -->
+                            <div class="hostel-photo-container" style="height: 250px; overflow: hidden;">
+                                <img src="{{ url_for('hostel_photo', filename=hostel.photo_filename) }}" 
+                                     class="card-img-top" 
+                                     style="width: 100%; height: 100%; object-fit: cover;"
+                                     alt="{{ hostel.name }}"
+                                     loading="lazy">
+                            </div>
+                            
+                            <div class="card-body">
+                                <!-- Hostel Name and Category -->
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <h5 class="card-title text-warning mb-0">
+                                        <i class="fas fa-building me-2"></i>{{ hostel.name }}
+                                    </h5>
+                                    <span class="badge {{ 'bg-primary' if hostel.category == 'Boys' else 'bg-danger' }}">
+                                        {{ hostel.category }}
+                                    </span>
+                                </div>
+                                
+                                <!-- Description -->
+                                {% if hostel.description %}
+                                <p class="card-text text-muted mb-3">{{ hostel.description }}</p>
+                                {% endif %}
+                                
+                                <!-- Facilities -->
+                                {% if hostel.facilities %}
+                                <div class="mb-3">
+                                    <h6 class="text-secondary mb-2">
+                                        <i class="fas fa-check-circle me-1"></i>Facilities Available:
+                                    </h6>
+                                    <div class="row">
+                                        {% for facility in hostel.facilities %}
+                                        <div class="col-6 mb-1">
+                                            <small class="text-success">
+                                                {% if facility == 'Mess' %}
+                                                    <i class="fas fa-utensils me-1"></i>
+                                                {% elif facility == 'Canteen' %}
+                                                    <i class="fas fa-coffee me-1"></i>
+                                                {% elif facility == 'Wifi' %}
+                                                    <i class="fas fa-wifi me-1"></i>
+                                                {% elif facility == 'Study Room' %}
+                                                    <i class="fas fa-book me-1"></i>
+                                                {% elif facility == 'Sports Area' %}
+                                                    <i class="fas fa-football-ball me-1"></i>
+                                                {% elif facility == 'Gym' %}
+                                                    <i class="fas fa-dumbbell me-1"></i>
+                                                {% else %}
+                                                    <i class="fas fa-check me-1"></i>
+                                                {% endif %}
+                                                {{ facility }}
+                                            </small>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Google Maps Link -->
+                                {% if hostel.maps_link %}
+                                <div class="mb-3">
+                                    <a href="{{ hostel.maps_link }}" target="_blank" class="btn btn-outline-warning btn-sm w-100">
+                                        <i class="fas fa-map me-2"></i>View on Google Maps
+                                    </a>
+                                    
+                                    <!-- Link display with copy button -->
+                                    <div class="mt-2">
+                                        <div class="input-group input-group-sm">
+                                            <input type="text" class="form-control form-control-sm text-muted" 
+                                                   value="{{ hostel.maps_link }}" 
+                                                   id="link-{{ hostel.id }}" readonly>
+                                            <button class="btn btn-outline-secondary btn-sm" type="button" 
+                                                    onclick="copyLink('{{ hostel.id }}')" title="Copy link">
+                                                <i class="fas fa-copy"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Basic Rules -->
+                                {% if hostel.basic_rules %}
+                                <div class="mb-3">
+                                    <h6 class="text-secondary mb-2">
+                                        <i class="fas fa-info-circle me-1"></i>Basic Rules:
+                                    </h6>
+                                    <small class="text-muted">{{ hostel.basic_rules }}</small>
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Date Added -->
+                                <div class="small text-muted mb-3">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    Added: {{ hostel.date_added[:10] if hostel.date_added else 'Unknown' }}
+                                </div>
+                            </div>
+                            
+                            <!-- Admin Delete Button -->
+                            <div class="card-footer bg-white">
+                                <div class="d-flex justify-content-end">
+                                    <button class="btn btn-outline-danger btn-sm" 
+                                            onclick="deleteHostel({{ hostel.id }}, '{{ hostel.name }}')">
+                                        <i class="fas fa-trash me-1"></i>Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <i class="fas fa-building fa-4x text-muted mb-3"></i>
+                            <h4 class="text-muted">No Hostel Information Available</h4>
+                            <p class="text-muted">Hostel details will be available here soon.</p>
+                            <p class="text-warning">Click the "Add Hostel" button above to add the first hostel information.</p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.hover-card {
+    transition: all 0.3s ease-in-out;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+}
+
+.hostel-photo-container {
+    position: relative;
+    background: #f8f9fa;
+}
+
+.hostel-photo-container img {
+    transition: transform 0.3s ease;
+    object-fit: cover !important;
+    width: 100% !important;
+    height: 250px !important;
+    object-position: center;
+}
+
+.hover-card:hover .hostel-photo-container img {
+    transform: scale(1.05);
+}
+
+/* Responsive design for mobile */
+@media (max-width: 768px) {
+    .hostel-photo-container {
+        height: 200px !important;
+    }
+    
+    .hostel-photo-container img {
+        height: 200px !important;
+    }
+    
+    .col-lg-6 {
+        margin-bottom: 1.5rem;
+    }
+}
+
+/* Facilities styling */
+.form-check-label {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.badge {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+}
+</style>
+
+<script>
+// Toggle Add Form
+function toggleAddForm() {
+    const form = document.getElementById('addHostelForm');
+    const btn = document.getElementById('addHostelBtn');
+    
+    if (form.style.display === 'none' || form.style.display === '') {
+        form.style.display = 'block';
+        btn.style.display = 'none';
+        // Scroll to form
+        form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+        form.style.display = 'none';
+        btn.style.display = 'block';
+        // Reset form
+        document.getElementById('hostelForm').reset();
+    }
+}
+
+// Copy Link Function
+function copyLink(hostelId) {
+    const linkInput = document.getElementById('link-' + hostelId);
+    linkInput.select();
+    linkInput.setSelectionRange(0, 99999); // For mobile devices
+    
+    try {
+        document.execCommand('copy');
+        showAlert('Link copied to clipboard!', 'success');
+    } catch (err) {
+        // Fallback for modern browsers
+        navigator.clipboard.writeText(linkInput.value).then(function() {
+            showAlert('Link copied to clipboard!', 'success');
+        }).catch(function(err) {
+            showAlert('Could not copy link', 'error');
+        });
+    }
+}
+
+// Delete Hostel Function
+function deleteHostel(hostelId, hostelName) {
+    if (confirm(`Are you sure you want to delete "${hostelName}"?`)) {
+        fetch(`{{ url_for('delete_hostel', hostel_id=0) }}`.replace('0', hostelId), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('Hostel deleted successfully', 'success');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                showAlert('Error deleting hostel: ' + data.error, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('Error deleting hostel', 'error');
+        });
+    }
+}
+
+// Form Submission Handler
+document.getElementById('hostelForm').addEventListener('submit', function(e) {
+    const submitBtn = document.getElementById('submitBtn');
+    const originalText = submitBtn.innerHTML;
+    
+    // Show loading state
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Adding...';
+    submitBtn.disabled = true;
+    
+    // Reset on any error
+    setTimeout(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }, 10000);
+});
+
+// Alert function
+function showAlert(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    const container = document.querySelector('.container');
+    container.insertBefore(alertDiv, container.firstChild);
+    
+    // Auto dismiss after 5 seconds
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
+
+// Hide form on page load
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('addHostelForm').style.display = 'none';
+});
+</script>
+{% endblock %}

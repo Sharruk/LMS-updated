@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+
+{% block title %}GPA Calculator - College Materials & PYQs Portal{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="bg-light py-2">
+    <div class="container">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('calculators_home') }}">Calculators</a></li>
+            <li class="breadcrumb-item active" aria-current="page">GPA Calculator</li>
+        </ol>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h2 mb-1">
+                    <i class="fas fa-graduation-cap text-primary me-2"></i>
+                    GPA Calculator
+                </h1>
+                <p class="text-muted mb-0">Calculate your Grade Point Average for a semester</p>
+            </div>
+            <a href="{{ url_for('calculators_home') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Back to Calculators
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-plus me-2"></i>Add Subjects
+                </h5>
+            </div>
+            <div class="card-body">
+                <form id="subjectForm">
+                    <div class="row g-3">
+                        <div class="col-md-5">
+                            <label for="subjectName" class="form-label">Subject Name</label>
+                            <input type="text" class="form-control" id="subjectName" placeholder="Enter subject name" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="grade" class="form-label">Grade</label>
+                            <select class="form-select" id="grade" required>
+                                <option value="">Select Grade</option>
+                                <option value="10">O (Outstanding)</option>
+                                <option value="9">A+ (Excellent)</option>
+                                <option value="8">A (Very Good)</option>
+                                <option value="7">B+ (Good)</option>
+                                <option value="6">B (Above Average)</option>
+                                <option value="0">RA (Reappear)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="credits" class="form-label">Credits</label>
+                            <input type="number" class="form-control" id="credits" min="1" max="10" placeholder="Credits" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-plus me-1"></i>Add
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-list me-2"></i>Subjects Added
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="subjectsTable" style="display: none;">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Grade</th>
+                                    <th>Grade Points</th>
+                                    <th>Credits</th>
+                                    <th>Total Points</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="subjectsList"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="noSubjects" class="text-center py-4">
+                    <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No subjects added yet</h5>
+                    <p class="text-muted">Add subjects using the form above to calculate your GPA</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-calculator me-2"></i>GPA Result
+                </h5>
+            </div>
+            <div class="card-body text-center">
+                <div id="gpaResult" style="display: none;">
+                    <h2 class="text-success mb-3" id="gpaValue">0.00</h2>
+                    <p class="text-muted mb-3">Your GPA</p>
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h6 class="text-primary" id="totalCredits">0</h6>
+                            <small class="text-muted">Total Credits</small>
+                        </div>
+                        <div class="col-6">
+                            <h6 class="text-info" id="totalPoints">0.00</h6>
+                            <small class="text-muted">Total Points</small>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline-danger mt-3" onclick="clearAll()">
+                        <i class="fas fa-trash me-1"></i>Clear All
+                    </button>
+                </div>
+                <div id="noGpa" class="py-4">
+                    <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                    <h6 class="text-muted">Add subjects to see your GPA</h6>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">Grade Point Scale</h6>
+            </div>
+            <div class="card-body">
+                <div class="row g-2 small">
+                    <div class="col-6"><strong>O:</strong> 10 points</div>
+                    <div class="col-6"><strong>A+:</strong> 9 points</div>
+                    <div class="col-6"><strong>A:</strong> 8 points</div>
+                    <div class="col-6"><strong>B+:</strong> 7 points</div>
+                    <div class="col-6"><strong>B:</strong> 6 points</div>
+                    <div class="col-6"><strong>RA:</strong> 0 points</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Formula Section -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-formula me-2"></i>Formula Used
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="bg-light p-3 rounded">
+                    <strong>GPA = (Σ (Grade Points × Credits)) / Σ Credits</strong>
+                    <br><small class="text-muted">Where Σ means "sum of all"</small>
+                </div>
+                <p class="mt-2 mb-0 small text-muted">
+                    Example: If you have Subject A (8 points, 3 credits) and Subject B (9 points, 4 credits), 
+                    then GPA = ((8×3) + (9×4)) / (3+4) = (24+36) / 7 = 8.57
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let subjects = [];
+
+document.getElementById('subjectForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    addSubject();
+});
+
+function addSubject() {
+    const name = document.getElementById('subjectName').value.trim();
+    const gradePoints = parseFloat(document.getElementById('grade').value);
+    const credits = parseInt(document.getElementById('credits').value);
+    
+    if (!name || isNaN(gradePoints) || isNaN(credits)) {
+        alert('Please fill all fields correctly');
+        return;
+    }
+    
+    const gradeText = document.getElementById('grade').selectedOptions[0].text;
+    
+    const subject = {
+        id: Date.now(),
+        name: name,
+        gradePoints: gradePoints,
+        gradeText: gradeText,
+        credits: credits,
+        totalPoints: gradePoints * credits
+    };
+    
+    subjects.push(subject);
+    updateDisplay();
+    clearForm();
+}
+
+function removeSubject(id) {
+    subjects = subjects.filter(s => s.id !== id);
+    updateDisplay();
+}
+
+function updateDisplay() {
+    const tbody = document.getElementById('subjectsList');
+    const subjectsTable = document.getElementById('subjectsTable');
+    const noSubjects = document.getElementById('noSubjects');
+    
+    if (subjects.length === 0) {
+        subjectsTable.style.display = 'none';
+        noSubjects.style.display = 'block';
+        document.getElementById('gpaResult').style.display = 'none';
+        document.getElementById('noGpa').style.display = 'block';
+        return;
+    }
+    
+    // Show table
+    subjectsTable.style.display = 'block';
+    noSubjects.style.display = 'none';
+    
+    // Update table
+    tbody.innerHTML = subjects.map(subject => `
+        <tr>
+            <td>${subject.name}</td>
+            <td>${subject.gradeText}</td>
+            <td>${subject.gradePoints}</td>
+            <td>${subject.credits}</td>
+            <td>${subject.totalPoints.toFixed(2)}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-danger" onclick="removeSubject(${subject.id})">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+    
+    // Calculate GPA
+    const totalCredits = subjects.reduce((sum, s) => sum + s.credits, 0);
+    const totalPoints = subjects.reduce((sum, s) => sum + s.totalPoints, 0);
+    const gpa = totalPoints / totalCredits;
+    
+    // Update GPA display
+    document.getElementById('gpaValue').textContent = gpa.toFixed(2);
+    document.getElementById('totalCredits').textContent = totalCredits;
+    document.getElementById('totalPoints').textContent = totalPoints.toFixed(2);
+    document.getElementById('gpaResult').style.display = 'block';
+    document.getElementById('noGpa').style.display = 'none';
+}
+
+function clearForm() {
+    document.getElementById('subjectName').value = '';
+    document.getElementById('grade').value = '';
+    document.getElementById('credits').value = '';
+}
+
+function clearAll() {
+    if (confirm('Are you sure you want to clear all subjects?')) {
+        subjects = [];
+        updateDisplay();
+    }
+}
+</script>
+{% endblock %}

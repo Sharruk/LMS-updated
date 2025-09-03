@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+
+{% block title %}Campus Places{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h1 class="card-title mb-3">
+                        <i class="fas fa-map-marker-alt me-3"></i>Campus Places
+                    </h1>
+                    <p class="card-text lead">
+                        Discover key locations around SSN College of Engineering campus with visual and map references.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Place Button -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <button type="button" class="btn btn-success btn-lg" id="addPlaceBtn" onclick="toggleAddForm()">
+                <i class="fas fa-plus me-2"></i>+ Add Place
+            </button>
+        </div>
+    </div>
+
+    <!-- Add Place Form (Hidden by default) -->
+    <div class="row mb-4" id="addPlaceForm" style="display: none;">
+        <div class="col-12">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-plus me-2"></i>Add New Campus Place
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('add_place') }}" method="post" enctype="multipart/form-data" id="placeForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="place_name" class="form-label">Place Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="place_name" name="place_name" 
+                                       placeholder="e.g., Admin Block, Library, Main Gate" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="place_photo" class="form-label">Photo (Optional)</label>
+                                <input type="file" class="form-control" id="place_photo" name="place_photo" 
+                                       accept=".jpg,.jpeg,.png">
+                                <div class="form-text">Supported formats: JPG, PNG</div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="place_description" class="form-label">Description (Optional)</label>
+                            <textarea class="form-control" id="place_description" name="place_description" rows="3" 
+                                      placeholder="Brief description about this place..."></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="maps_link" class="form-label">Google Maps Link (Optional)</label>
+                            <input type="url" class="form-control" id="maps_link" name="maps_link" 
+                                   placeholder="https://maps.google.com/...">
+                            <div class="form-text">Direct link to the location on Google Maps</div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success" id="submitBtn">
+                                <i class="fas fa-plus me-2"></i>Add Place
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="toggleAddForm()">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Places Display -->
+    <div class="row">
+        <div class="col-12">
+            {% if places %}
+                <h3 class="mb-4">
+                    <i class="fas fa-map-marker-alt me-2"></i>Campus Places 
+                    <span class="badge bg-primary">{{ places|length }}</span>
+                </h3>
+                
+                <div class="row">
+                    {% for place in places %}
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="card h-100 shadow-sm hover-card">
+                            <!-- Place Photo (if available) -->
+                            {% if place.photo_filename %}
+                            <div class="place-photo-container" style="height: 200px; overflow: hidden;">
+                                <img src="{{ url_for('place_photo', filename=place.photo_filename) }}" 
+                                     class="card-img-top" 
+                                     style="width: 100%; height: 100%; object-fit: cover;"
+                                     alt="{{ place.name }}"
+                                     loading="lazy">
+                            </div>
+                            {% else %}
+                            <div class="place-photo-container bg-light d-flex align-items-center justify-content-center" style="height: 200px;">
+                                <i class="fas fa-map-marker-alt fa-3x text-muted"></i>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="card-body">
+                                <h5 class="card-title text-primary mb-3">
+                                    <i class="fas fa-map-marker-alt me-2"></i>{{ place.name }}
+                                </h5>
+                                
+                                {% if place.description %}
+                                <p class="card-text text-muted mb-3">{{ place.description }}</p>
+                                {% endif %}
+                                
+                                <!-- Google Maps Link -->
+                                {% if place.maps_link %}
+                                <div class="mb-3">
+                                    <a href="{{ place.maps_link }}" target="_blank" class="btn btn-outline-primary btn-sm w-100">
+                                        <i class="fas fa-map me-2"></i>Open in Google Maps
+                                    </a>
+                                    
+                                    <!-- Link display with copy button -->
+                                    <div class="mt-2">
+                                        <div class="input-group input-group-sm">
+                                            <input type="text" class="form-control form-control-sm text-muted" 
+                                                   value="{{ place.maps_link }}" 
+                                                   id="link-{{ place.id }}" readonly>
+                                            <button class="btn btn-outline-secondary btn-sm" type="button" 
+                                                    onclick="copyLink('{{ place.id }}')" title="Copy link">
+                                                <i class="fas fa-copy"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Date Added -->
+                                <div class="small text-muted mb-3">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    Added: {{ place.date_added[:10] if place.date_added else 'Unknown' }}
+                                </div>
+                            </div>
+                            
+                            <!-- Admin Delete Button -->
+                            <div class="card-footer bg-white">
+                                <div class="d-flex justify-content-end">
+                                    <button class="btn btn-outline-danger btn-sm" 
+                                            onclick="deletePlace({{ place.id }}, '{{ place.name }}')">
+                                        <i class="fas fa-trash me-1"></i>Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <i class="fas fa-map-marker-alt fa-4x text-muted mb-3"></i>
+                            <h4 class="text-muted">No Campus Places Added Yet</h4>
+                            <p class="text-muted">Help students and visitors find key locations around campus.</p>
+                            <p class="text-primary">Click the "Add Place" button above to add the first location.</p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.hover-card {
+    transition: all 0.3s ease-in-out;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+}
+
+.place-photo-container {
+    position: relative;
+    background: #f8f9fa;
+}
+
+.place-photo-container img {
+    transition: transform 0.3s ease;
+}
+
+.hover-card:hover .place-photo-container img {
+    transform: scale(1.05);
+}
+
+/* Static image sizing - prevents zoom in/out on screen resizing */
+.place-photo-container img {
+    object-fit: cover !important;
+    width: 100% !important;
+    height: 200px !important;
+    object-position: center;
+}
+
+/* Responsive design for mobile */
+@media (max-width: 768px) {
+    .place-photo-container {
+        height: 180px !important;
+    }
+    
+    .place-photo-container img {
+        height: 180px !important;
+    }
+}
+</style>
+
+<script>
+// Toggle Add Form
+function toggleAddForm() {
+    const form = document.getElementById('addPlaceForm');
+    const btn = document.getElementById('addPlaceBtn');
+    
+    if (form.style.display === 'none' || form.style.display === '') {
+        form.style.display = 'block';
+        btn.style.display = 'none';
+        // Scroll to form
+        form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+        form.style.display = 'none';
+        btn.style.display = 'block';
+        // Reset form
+        document.getElementById('placeForm').reset();
+    }
+}
+
+// Copy Link Function
+function copyLink(placeId) {
+    const linkInput = document.getElementById('link-' + placeId);
+    linkInput.select();
+    linkInput.setSelectionRange(0, 99999); // For mobile devices
+    
+    try {
+        document.execCommand('copy');
+        showAlert('Link copied to clipboard!', 'success');
+    } catch (err) {
+        // Fallback for modern browsers
+        navigator.clipboard.writeText(linkInput.value).then(function() {
+            showAlert('Link copied to clipboard!', 'success');
+        }).catch(function(err) {
+            showAlert('Could not copy link', 'error');
+        });
+    }
+}
+
+// Delete Place Function
+function deletePlace(placeId, placeName) {
+    if (confirm(`Are you sure you want to delete "${placeName}"?`)) {
+        fetch(`{{ url_for('delete_place', place_id=0) }}`.replace('0', placeId), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('Place deleted successfully', 'success');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            } else {
+                showAlert('Error deleting place: ' + data.error, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('Error deleting place', 'error');
+        });
+    }
+}
+
+// Form Submission Handler
+document.getElementById('placeForm').addEventListener('submit', function(e) {
+    const submitBtn = document.getElementById('submitBtn');
+    const originalText = submitBtn.innerHTML;
+    
+    // Show loading state
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Adding...';
+    submitBtn.disabled = true;
+    
+    // Reset on any error
+    setTimeout(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }, 10000);
+});
+
+// Alert function
+function showAlert(message, type) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    const container = document.querySelector('.container');
+    container.insertBefore(alertDiv, container.firstChild);
+    
+    // Auto dismiss after 5 seconds
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
+
+// Hide form on page load
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('addPlaceForm').style.display = 'none';
+});
+</script>
+{% endblock %}

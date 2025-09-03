@@ -1,0 +1,22 @@
+{
+  "hostels": [
+    {
+      "id": 1,
+      "name": "hostel A",
+      "category": "Boys",
+      "description": "this is the boys hostel",
+      "maps_link": "https://www.google.com/maps/place/SSN+Main+Rd,+Tamil+Nadu+603103/@12.752161,80.1975314,849m/data=!3m2!1e3!4b1!4m6!3m5!1s0x3a52512509844625:0xdde049f8fcdfccb7!8m2!3d12.752161!4d80.2024023!16s%2Fg%2F11fy1f3wfd?entry=ttu&g_ep=EgoyMDI1MDYyNi4wIKXMDSoASAFQAw%3D%3D",
+      "facilities": [
+        "Mess",
+        "Wifi",
+        "Study Room",
+        "Sports Area"
+      ],
+      "basic_rules": "",
+      "photo_filename": "hostel_20250630_171834_Screenshot_2025-06-30_224841.png",
+      "photo_path": "uploads/hostels/hostel_20250630_171834_Screenshot_2025-06-30_224841.png",
+      "date_added": "2025-06-30T17:18:34.339961"
+    }
+  ],
+  "next_id": 2
+}

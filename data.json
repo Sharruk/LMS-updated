@@ -1,0 +1,430 @@
+{
+  "course_types": {
+    "ug": {
+      "name": "Under Graduate (UG)",
+      "departments": {
+        "cse": {
+          "name": "Computer Science & Engineering",
+          "semesters": {
+            "1": {
+              "name": "Semester 1"
+            },
+            "2": {
+              "name": "Semester 2"
+            },
+            "3": {
+              "name": "Semester 3"
+            },
+            "4": {
+              "name": "Semester 4"
+            },
+            "5": {
+              "name": "Semester 5"
+            },
+            "6": {
+              "name": "Semester 6"
+            },
+            "7": {
+              "name": "Semester 7"
+            },
+            "8": {
+              "name": "Semester 8"
+            }
+          }
+        },
+        "mech": {
+          "name": "Mechanical Engineering",
+          "semesters": {
+            "1": {
+              "name": "Semester 1"
+            },
+            "2": {
+              "name": "Semester 2"
+            },
+            "3": {
+              "name": "Semester 3"
+            },
+            "4": {
+              "name": "Semester 4"
+            },
+            "5": {
+              "name": "Semester 5"
+            },
+            "6": {
+              "name": "Semester 6"
+            },
+            "7": {
+              "name": "Semester 7"
+            },
+            "8": {
+              "name": "Semester 8"
+            }
+          }
+        },
+        "eee": {
+          "name": "Electrical & Electronics Engineering",
+          "semesters": {
+            "1": {
+              "name": "Semester 1"
+            },
+            "2": {
+              "name": "Semester 2"
+            },
+            "3": {
+              "name": "Semester 3"
+            },
+            "4": {
+              "name": "Semester 4"
+            },
+            "5": {
+              "name": "Semester 5"
+            },
+            "6": {
+              "name": "Semester 6"
+            },
+            "7": {
+              "name": "Semester 7"
+            },
+            "8": {
+              "name": "Semester 8"
+            }
+          }
+        },
+        "ece": {
+          "name": "Electronics & Communication Engineering",
+          "semesters": {
+            "1": {
+              "name": "Semester 1"
+            },
+            "2": {
+              "name": "Semester 2"
+            },
+            "3": {
+              "name": "Semester 3"
+            },
+            "4": {
+              "name": "Semester 4"
+            },
+            "5": {
+              "name": "Semester 5"
+            },
+            "6": {
+              "name": "Semester 6"
+            },
+            "7": {
+              "name": "Semester 7"
+            },
+            "8": {
+              "name": "Semester 8"
+            }
+          }
+        },
+        "it": {
+          "name": "Information Technology",
+          "semesters": {
+            "1": {
+              "name": "Semester 1"
+            },
+            "2": {
+              "name": "Semester 2"
+            },
+            "3": {
+              "name": "Semester 3"
+            },
+            "4": {
+              "name": "Semester 4"
+            },
+            "5": {
+              "name": "Semester 5"
+            },
+            "6": {
+              "name": "Semester 6"
+            },
+            "7": {
+              "name": "Semester 7"
+            },
+            "8": {
+              "name": "Semester 8"
+            }
+          }
+        },
+        "chem": {
+          "name": "Chemical Engineering",
+          "semesters": {
+            "1": {
+              "name": "Semester 1"
+            },
+            "2": {
+              "name": "Semester 2"
+            },
+            "3": {
+              "name": "Semester 3"
+            },
+            "4": {
+              "name": "Semester 4"
+            },
+            "5": {
+              "name": "Semester 5"
+            },
+            "6": {
+              "name": "Semester 6"
+            },
+            "7": {
+              "name": "Semester 7"
+            },
+            "8": {
+              "name": "Semester 8"
+            }
+          }
+        },
+        "civil": {
+          "name": "Civil Engineering",
+          "semesters": {
+            "1": {
+              "name": "Semester 1"
+            },
+            "2": {
+              "name": "Semester 2"
+            },
+            "3": {
+              "name": "Semester 3"
+            },
+            "4": {
+              "name": "Semester 4"
+            },
+            "5": {
+              "name": "Semester 5"
+            },
+            "6": {
+              "name": "Semester 6"
+            },
+            "7": {
+              "name": "Semester 7"
+            },
+            "8": {
+              "name": "Semester 8"
+            }
+          }
+        }
+      }
+    },
+    "pg": {
+      "name": "Post Graduate (PG)",
+      "departments": {
+        "mtech_cse": {
+          "name": "M.Tech CSE (5-Year)",
+          "semesters": {
+            "1": {
+              "name": "Semester 1"
+            },
+            "2": {
+              "name": "Semester 2"
+            },
+            "3": {
+              "name": "Semester 3"
+            },
+            "4": {
+              "name": "Semester 4"
+            },
+            "5": {
+              "name": "Semester 5"
+            },
+            "6": {
+              "name": "Semester 6"
+            },
+            "7": {
+              "name": "Semester 7"
+            },
+            "8": {
+              "name": "Semester 8"
+            },
+            "9": {
+              "name": "Semester 9"
+            },
+            "10": {
+              "name": "Semester 10"
+            }
+          }
+        },
+        "me_applied_electronics": {
+          "name": "M.E Applied Electronics",
+          "semesters": {
+            "1": {
+              "name": "Semester 1"
+            },
+            "2": {
+              "name": "Semester 2"
+            },
+            "3": {
+              "name": "Semester 3"
+            },
+            "4": {
+              "name": "Semester 4"
+            }
+          }
+        },
+        "me_structural": {
+          "name": "M.E Structural",
+          "semesters": {
+            "1": {
+              "name": "Semester 1"
+            },
+            "2": {
+              "name": "Semester 2"
+            },
+            "3": {
+              "name": "Semester 3"
+            },
+            "4": {
+              "name": "Semester 4"
+            }
+          }
+        },
+        "me_ped": {
+          "name": "M.E PED",
+          "semesters": {
+            "1": {
+              "name": "Semester 1"
+            },
+            "2": {
+              "name": "Semester 2"
+            },
+            "3": {
+              "name": "Semester 3"
+            },
+            "4": {
+              "name": "Semester 4"
+            }
+          }
+        }
+      }
+    },
+    "mba": {
+      "name": "Master of Business Administration (MBA)",
+      "departments": {
+        "general_mba": {
+          "name": "General MBA",
+          "semesters": {
+            "1": {
+              "name": "Semester 1"
+            },
+            "2": {
+              "name": "Semester 2"
+            },
+            "3": {
+              "name": "Semester 3"
+            },
+            "4": {
+              "name": "Semester 4"
+            }
+          }
+        }
+      }
+    }
+  },
+  "files": [
+    {
+      "id": 4,
+      "filename": "Toyota.csv",
+      "original_filename": "Toyota.csv",
+      "custom_filename": "Toyota.csv",
+      "course_type": "mba",
+      "department": "general_mba",
+      "semester": "2",
+      "category": "ESE",
+      "subject": "data science",
+      "description": "",
+      "size": "64.1 KB",
+      "upload_date": "2025-06-25 13:46:20",
+      "file_path": "uploads/Toyota.csv",
+      "likes": 5,
+      "dislikes": 3,
+      "comments": [
+        {
+          "name": "brock",
+          "comment": "this is the admin. this for the checking of the app comment section coz just now imported from the git hub",
+          "date": "2025-06-25 13:49"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "filename": "BST.docx",
+      "original_filename": "BST.docx",
+      "custom_filename": "BST",
+      "course_type": "pg",
+      "department": "mtech_cse",
+      "semester": "2",
+      "category": "ESE",
+      "subject": "DSA",
+      "description": "basic implementation of BST in c along with the code",
+      "size": "33.9 KB",
+      "upload_date": "2025-06-25 14:14:09",
+      "file_path": "uploads/BST.docx",
+      "likes": 0,
+      "dislikes": 0,
+      "comments": []
+    },
+    {
+      "id": 6,
+      "filename": "Statistical_Tables_1.pdf",
+      "original_filename": "Statistical Tables (1).pdf",
+      "custom_filename": "Statistical_Tables_1.pdf",
+      "course_type": "ug",
+      "department": "cse",
+      "semester": "1",
+      "category": "CAT",
+      "subject": "maths",
+      "description": "normal distributio,z,t,f,chi-square test value is in this table",
+      "size": "524.1 KB",
+      "upload_date": "2025-06-25 15:48:53",
+      "file_path": "uploads/Statistical_Tables_1.pdf",
+      "likes": 2,
+      "dislikes": 1,
+      "comments": [
+        {
+          "name": "John Cena",
+          "comment": "this is the admin. Finally file preview is know available Now.",
+          "date": "2025-06-25 15:50"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "filename": "Development-of-Scientific-Tamil-and-Tamil-Computing.pptx",
+      "original_filename": "Development-of-Scientific-Tamil-and-Tamil-Computing.pptx",
+      "custom_filename": "Development-of-Scientific-Tamil-and-Tamil-Computing.pptx",
+      "course_type": "ug",
+      "department": "it",
+      "semester": "1",
+      "category": "CAT",
+      "subject": "Tamil",
+      "description": "scientific tamil ppt exam material",
+      "size": "2.9 MB",
+      "upload_date": "2025-06-25 16:19:00",
+      "file_path": "uploads/Development-of-Scientific-Tamil-and-Tamil-Computing.pptx",
+      "likes": 0,
+      "dislikes": 0,
+      "comments": []
+    },
+    {
+      "id": 8,
+      "filename": "syllabus.docx",
+      "original_filename": "syllabus.docx",
+      "custom_filename": "syllabus.docx",
+      "course_type": "ug",
+      "department": "cse",
+      "semester": "3",
+      "category": "CAT",
+      "subject": "data science",
+      "description": "this file contains data science syllabus for the 3rd semester.",
+      "size": "143.3 KB",
+      "upload_date": "2025-06-27 03:10:11",
+      "file_path": "uploads/syllabus.docx",
+      "likes": 4,
+      "dislikes": 5,
+      "comments": []
+    }
+  ],
+  "syllabus_files": []
+}

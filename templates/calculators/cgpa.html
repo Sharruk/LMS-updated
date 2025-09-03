@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+
+{% block title %}CGPA Calculator - College Materials & PYQs Portal{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb" class="bg-light py-2">
+    <div class="container">
+        <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('calculators_home') }}">Calculators</a></li>
+            <li class="breadcrumb-item active" aria-current="page">CGPA Calculator</li>
+        </ol>
+    </div>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h2 mb-1">
+                    <i class="fas fa-chart-line text-success me-2"></i>
+                    CGPA Calculator
+                </h1>
+                <p class="text-muted mb-0">Calculate your Cumulative Grade Point Average across semesters</p>
+            </div>
+            <a href="{{ url_for('calculators_home') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Back to Calculators
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-plus me-2"></i>Add Semester Data
+                </h5>
+            </div>
+            <div class="card-body">
+                <form id="semesterForm">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label for="semesterName" class="form-label">Semester</label>
+                            <input type="text" class="form-control" id="semesterName" placeholder="e.g., Semester 1" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="semesterGpa" class="form-label">GPA</label>
+                            <input type="number" class="form-control" id="semesterGpa" min="0" max="10" step="0.01" placeholder="0.00" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="semesterCredits" class="form-label">Total Credits</label>
+                            <input type="number" class="form-control" id="semesterCredits" min="1" placeholder="Credits" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">&nbsp;</label>
+                            <button type="submit" class="btn btn-success w-100">
+                                <i class="fas fa-plus me-1"></i>Add
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-list me-2"></i>Semesters Added
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="semestersTable" style="display: none;">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Semester</th>
+                                    <th>GPA</th>
+                                    <th>Credits</th>
+                                    <th>Total Points</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="semestersList"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div id="noSemesters" class="text-center py-4">
+                    <i class="fas fa-calendar-alt fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No semesters added yet</h5>
+                    <p class="text-muted">Add at least 2 semesters to calculate your CGPA</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-calculator me-2"></i>CGPA Result
+                </h5>
+            </div>
+            <div class="card-body text-center">
+                <div id="cgpaResult" style="display: none;">
+                    <h2 class="text-primary mb-3" id="cgpaValue">0.00</h2>
+                    <p class="text-muted mb-3">Your CGPA</p>
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h6 class="text-success" id="totalSemesters">0</h6>
+                            <small class="text-muted">Semesters</small>
+                        </div>
+                        <div class="col-6">
+                            <h6 class="text-info" id="totalCreditsOverall">0</h6>
+                            <small class="text-muted">Total Credits</small>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline-danger mt-3" onclick="clearAll()">
+                        <i class="fas fa-trash me-1"></i>Clear All
+                    </button>
+                </div>
+                <div id="noCgpa" class="py-4">
+                    <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                    <h6 class="text-muted">Add semesters to see your CGPA</h6>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h6 class="card-title mb-0">CGPA Scale</h6>
+            </div>
+            <div class="card-body">
+                <div class="small">
+                    <div class="row g-1">
+                        <div class="col-6"><strong>9.0-10.0:</strong> Outstanding</div>
+                        <div class="col-6"><strong>8.0-8.9:</strong> Excellent</div>
+                        <div class="col-6"><strong>7.0-7.9:</strong> Very Good</div>
+                        <div class="col-6"><strong>6.0-6.9:</strong> Good</div>
+                        <div class="col-6"><strong>5.0-5.9:</strong> Average</div>
+                        <div class="col-6"><strong>< 5.0:</strong> Below Average</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Formula Section -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-formula me-2"></i>Formula Used
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="bg-light p-3 rounded">
+                    <strong>CGPA = (Σ (Semester GPA × Semester Credits)) / Σ Semester Credits</strong>
+                    <br><small class="text-muted">Where Σ means "sum of all"</small>
+                </div>
+                <p class="mt-2 mb-0 small text-muted">
+                    Example: Semester 1 (GPA: 8.5, Credits: 20) and Semester 2 (GPA: 9.0, Credits: 22), 
+                    then CGPA = ((8.5×20) + (9.0×22)) / (20+22) = (170+198) / 42 = 8.76
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let semesters = [];
+
+document.getElementById('semesterForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    addSemester();
+});
+
+function addSemester() {
+    const name = document.getElementById('semesterName').value.trim();
+    const gpa = parseFloat(document.getElementById('semesterGpa').value);
+    const credits = parseInt(document.getElementById('semesterCredits').value);
+    
+    if (!name || isNaN(gpa) || isNaN(credits) || gpa < 0 || gpa > 10) {
+        alert('Please fill all fields correctly. GPA should be between 0 and 10.');
+        return;
+    }
+    
+    const semester = {
+        id: Date.now(),
+        name: name,
+        gpa: gpa,
+        credits: credits,
+        totalPoints: gpa * credits
+    };
+    
+    semesters.push(semester);
+    updateDisplay();
+    clearForm();
+}
+
+function removeSemester(id) {
+    semesters = semesters.filter(s => s.id !== id);
+    updateDisplay();
+}
+
+function updateDisplay() {
+    const tbody = document.getElementById('semestersList');
+    const semestersTable = document.getElementById('semestersTable');
+    const noSemesters = document.getElementById('noSemesters');
+    
+    if (semesters.length === 0) {
+        semestersTable.style.display = 'none';
+        noSemesters.style.display = 'block';
+        document.getElementById('cgpaResult').style.display = 'none';
+        document.getElementById('noCgpa').style.display = 'block';
+        return;
+    }
+    
+    // Show table
+    semestersTable.style.display = 'block';
+    noSemesters.style.display = 'none';
+    
+    // Update table
+    tbody.innerHTML = semesters.map(semester => `
+        <tr>
+            <td>${semester.name}</td>
+            <td>${semester.gpa.toFixed(2)}</td>
+            <td>${semester.credits}</td>
+            <td>${semester.totalPoints.toFixed(2)}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-danger" onclick="removeSemester(${semester.id})">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+    
+    // Calculate CGPA only if at least 2 semesters
+    if (semesters.length >= 2) {
+        const totalCredits = semesters.reduce((sum, s) => sum + s.credits, 0);
+        const totalPoints = semesters.reduce((sum, s) => sum + s.totalPoints, 0);
+        const cgpa = totalPoints / totalCredits;
+        
+        // Update CGPA display
+        document.getElementById('cgpaValue').textContent = cgpa.toFixed(2);
+        document.getElementById('totalSemesters').textContent = semesters.length;
+        document.getElementById('totalCreditsOverall').textContent = totalCredits;
+        document.getElementById('cgpaResult').style.display = 'block';
+        document.getElementById('noCgpa').style.display = 'none';
+    } else {
+        document.getElementById('cgpaResult').style.display = 'none';
+        document.getElementById('noCgpa').style.display = 'block';
+    }
+}
+
+function clearForm() {
+    document.getElementById('semesterName').value = '';
+    document.getElementById('semesterGpa').value = '';
+    document.getElementById('semesterCredits').value = '';
+}
+
+function clearAll() {
+    if (confirm('Are you sure you want to clear all semesters?')) {
+        semesters = [];
+        updateDisplay();
+    }
+}
+</script>
+{% endblock %}
