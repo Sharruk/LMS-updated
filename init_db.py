@@ -189,11 +189,8 @@ def seed_subjects():
                         counter = 1
                         
                         while unique_code in created_codes:
-                            if course_type == 'UG' and dept_key != 'CSE':
-                                unique_code = f"{dept_key[:2]}{base_code[2:]}"
-                            else:
-                                unique_code = f"{base_code}_{counter}"
-                                counter += 1
+                            unique_code = f"{base_code}_{dept_key}_{counter}"
+                            counter += 1
                         
                         created_codes.add(unique_code)
                         

@@ -51,7 +51,6 @@ dist/
 build/
 
 # Replit specific
-.replit
 replit.nix
 .config/
 .cache/

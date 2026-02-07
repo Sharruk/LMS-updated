@@ -1,0 +1,198 @@
+WHAT STAGE YOU ARE AT (CLEARLY)
+
+You already have a college-focused multi-feature portal.
+
+Now you want to pivot it into:
+
+Tamil Nadu State Board – Question Papers & Answer Keys Portal
+
+So this is NOT a rebuild, it’s a product refocus.
+
+✅ WHAT TO CHANGE
+❌ WHAT TO REMOVE
+👤 WHAT ROLES TO ADD
+🧠 WHY EACH DECISION MAKES SENSE
+1️⃣ CORE IDENTITY CHANGE (MANDATORY)
+❌ REMOVE
+
+College
+
+Campus
+
+Hostel
+
+Bus
+
+Canteen
+
+Clubs
+
+Events
+
+Routes
+
+Calculators (college-specific)
+
+✅ CHANGE TO
+
+School-focused
+
+Exam-focused
+
+Content-first
+
+🧠 WHY
+
+School students:
+
+Don’t explore
+
+Don’t socialize on portals
+
+Want papers → download → leave
+
+Less features = more trust.
+
+2️⃣ NAVBAR – WHAT TO KEEP / REMOVE
+❌ REMOVE FROM NAVBAR
+
+Calculators
+
+Community
+
+Clubs
+
+Canteen
+
+Campus
+
+Hostel
+
+Events
+
+Routes
+
+✅ NEW NAVBAR (SIMPLE & STRONG)
+Home
+Classes
+Subjects
+Question Papers
+Answer Keys
+Search
+Upload
+
+🧠 WHY
+
+This matches student mental model:
+
+“Which class? Which subject? Which exam?”
+
+3️⃣ HOMEPAGE – WHAT IT SHOULD SHOW
+❌ REMOVE
+
+College branding
+
+Multi-feature cards
+
+Campus-style dashboard
+
+✅ ADD
+
+Homepage sections (scroll-based, SEO-friendly):
+
+Choose Your Class
+
+Class 9
+
+Class 10
+
+Class 11
+
+Class 12
+
+Popular Exams
+
+Unit Test
+
+Quarterly
+
+Half Yearly
+
+Annual
+
+Model Practical
+
+Recently Added Papers
+
+Simple list with year + subject
+
+🧠 WHY
+
+Famous sites win because:
+
+No decisions upfront
+
+Scroll → click → download
+
+4️⃣ CONTENT STRUCTURE (DO NOT BREAK THIS)
+
+Your backend should follow:
+
+Class
+ └── Subject
+     └── Exam Type
+         └── Year
+             ├── Question Paper
+             └── Answer Key
+
+Exam Types (LOCK THESE)
+
+Unit Test 1
+
+Unit Test 2
+
+Unit Test 3
+
+Quarterly Exam
+
+Half Yearly Exam
+
+Revision Test
+
+Model Practical
+
+Practical Exam
+
+Annual Exam
+
+🧠 WHY
+
+Matches TN board reality
+
+Prevents messy uploads
+
+Scales cleanly for years
+
+5️⃣ FILTERING STRATEGY (IMPORTANT)
+❌ DO NOT
+
+Show heavy filters on homepage
+
+✅ DO
+
+Homepage → NO filters
+
+Section pages → Light filters
+
+Year
+
+Medium
+
+With Answers
+
+Separate Advanced Search page
+
+🧠 WHY
+
+Filters help only after content grows
+Early filters scare users.

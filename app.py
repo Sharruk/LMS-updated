@@ -39,20 +39,20 @@ def load_data():
     try:
         if os.path.exists(DATA_FILE):
             with open(DATA_FILE, 'r') as f:
-                return json.load(f)
+                data = json.load(f)
+            if 'classes' not in data and 'course_types' in data:
+                data['classes'] = data['course_types']
+            if 'exam_types' not in data:
+                data['exam_types'] = [
+                    "CAT", "ESE", "SAT", "Practical"
+                ]
+            return data
         else:
             data = {
-                "classes": {
-                    "9": {"name": "Class 9", "subjects": {}},
-                    "10": {"name": "Class 10", "subjects": {}},
-                    "11": {"name": "Class 11", "subjects": {}},
-                    "12": {"name": "Class 12", "subjects": {}}
-                },
+                "course_types": {},
+                "classes": {},
                 "exam_types": [
-                    "Unit Test 1", "Unit Test 2", "Unit Test 3",
-                    "Quarterly Exam", "Half Yearly Exam",
-                    "Revision Test", "Model Practical",
-                    "Practical Exam", "Annual Exam"
+                    "CAT", "ESE", "SAT", "Practical"
                 ],
                 "files": []
             }
@@ -60,7 +60,7 @@ def load_data():
             return data
     except Exception as e:
         app.logger.error(f"Error loading data: {e}")
-        return {"classes": {}, "files": []}
+        return {"classes": {}, "files": [], "exam_types": []}
 
 def save_data(data):
     """Save data to JSON file"""

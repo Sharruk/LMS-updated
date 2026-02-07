@@ -8,20 +8,20 @@
   </ol>
 </nav>
 
-<h2 class="mb-4">Subjects for {{ class_data.name }}</h2>
+<h2 class="mb-4">Departments for {{ class_data.name }}</h2>
 <div class="row g-4">
-    {% for subject_id, subject_name in class_data.subjects.items() %}
+    {% for dept_id, dept_data in class_data.get('departments', {}).items() %}
     <div class="col-md-4">
         <div class="card shadow-sm border-0">
             <div class="card-body">
-                <h5 class="card-title">{{ subject_name }}</h5>
-                <a href="{{ url_for('view_subject', class_id=class_id, subject_id=subject_id) }}" class="btn btn-outline-primary btn-sm">View Exams</a>
+                <h5 class="card-title">{{ dept_data.name }}</h5>
+                <a href="{{ url_for('view_subject', class_id=class_id, subject_id=dept_id) }}" class="btn btn-outline-primary btn-sm">View Semesters</a>
             </div>
         </div>
     </div>
     {% else %}
     <div class="col-12 text-center text-muted py-5">
-        <p>No subjects added yet.</p>
+        <p>No departments added yet.</p>
     </div>
     {% endfor %}
 </div>
