@@ -47,11 +47,18 @@
                             <input type="text" name="year" id="year" class="form-control" placeholder="e.g. 2024" required>
                         </div>
                         <div class="col-12">
-                            <label for="file" class="form-label fw-semibold">File Upload (PDF only)</label>
-                            <input type="file" name="file" id="file" class="form-control" accept=".pdf" required>
+                            <label class="form-label fw-semibold">File Upload</label>
+                            <div id="drop-zone" class="border border-primary border-2 border-dashed rounded-3 p-4 text-center bg-light" style="cursor: pointer;">
+                                <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-2"></i>
+                                <p class="mb-1">Drag & Drop files here or click to browse</p>
+                                <p class="text-muted small">Supports PDF, Images, Word, Excel, PPT, etc.</p>
+                                <input type="file" name="file" id="file" class="d-none" required>
+                                <div id="file-info" class="mt-2 fw-bold text-success d-none"></div>
+                            </div>
                         </div>
-                        <div class="col-12 text-muted small">
-                            Only PDF files are supported.
+                        <div class="col-12">
+                            <label for="custom_filename" class="form-label fw-semibold">Custom Filename (Optional)</label>
+                            <input type="text" name="custom_filename" id="custom_filename" class="form-control" placeholder="e.g. Mathematics Question Paper 2024">
                         </div>
                         <div class="col-12">
                             <label for="description" class="form-label fw-semibold">Description (Optional)</label>
@@ -86,5 +93,37 @@ document.getElementById('class').addEventListener('change', function() {
     });
     subjectSelect.value = "";
 });
+
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('file');
+const fileInfo = document.getElementById('file-info');
+
+dropZone.onclick = () => fileInput.click();
+
+fileInput.onchange = (e) => {
+    if (fileInput.files.length > 0) {
+        fileInfo.textContent = "Selected: " + fileInput.files[0].name;
+        fileInfo.classList.remove('d-none');
+    }
+};
+
+dropZone.ondragover = (e) => {
+    e.preventDefault();
+    dropZone.classList.add('bg-primary', 'bg-opacity-10');
+};
+
+dropZone.ondragleave = () => {
+    dropZone.classList.remove('bg-primary', 'bg-opacity-10');
+};
+
+dropZone.ondrop = (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('bg-primary', 'bg-opacity-10');
+    if (e.dataTransfer.files.length > 0) {
+        fileInput.files = e.dataTransfer.files;
+        fileInfo.textContent = "Selected: " + fileInput.files[0].name;
+        fileInfo.classList.remove('d-none');
+    }
+};
 </script>
 {% endblock %}

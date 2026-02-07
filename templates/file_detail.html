@@ -20,7 +20,7 @@
                 <div class="card-header bg-white py-3">
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="mb-0 text-truncate" style="max-width: 70%;">
-                            <i class="far fa-file-pdf text-danger me-2"></i>
+                            <i class="far fa-file me-2 text-primary"></i>
                             {{ file.custom_filename }}
                         </h5>
                         <div class="d-flex gap-2">
@@ -34,6 +34,8 @@
                     </div>
                 </div>
                 <div class="card-body p-0">
+                    {% set ext = file.filename.split('.')[-1].lower() %}
+                    {% if ext == 'pdf' %}
                     <div class="bg-dark text-white p-2 d-flex justify-content-between align-items-center sticky-top" style="z-index: 100;">
                         <div class="d-flex align-items-center gap-2">
                             <button onclick="prevPage()" class="btn btn-sm btn-outline-light">
@@ -53,11 +55,7 @@
                                 <i class="fas fa-search-plus"></i>
                             </button>
                         </div>
-                        <a href="{{ url_for('download_file', file_id=file.id) }}" class="btn btn-sm btn-success">
-                            <i class="fas fa-download"></i> Download
-                        </a>
                     </div>
-                    
                     <div class="pdf-container bg-secondary bg-opacity-10 d-flex justify-content-center overflow-auto" style="min-height: 600px;">
                         <canvas id="pdfCanvas" class="shadow-sm mt-3 mb-3" style="max-width: 100%; height: auto;"></canvas>
                         <div id="pdfLoading" class="p-5 text-center d-none">
@@ -66,6 +64,20 @@
                             </div>
                         </div>
                     </div>
+                    {% elif ext in ['jpg', 'jpeg', 'png', 'gif'] %}
+                    <div class="text-center p-3 bg-light">
+                        <img src="{{ url_for('download_file', file_id=file.id) }}" class="img-fluid rounded shadow-sm" alt="Preview">
+                    </div>
+                    {% else %}
+                    <div class="p-5 text-center">
+                        <i class="fas fa-file-download fa-4x text-muted mb-3"></i>
+                        <h5>No preview available for this file type</h5>
+                        <p class="text-muted">Click the button below to download and view the file.</p>
+                        <a href="{{ url_for('download_file', file_id=file.id) }}" class="btn btn-primary">
+                            <i class="fas fa-download me-2"></i> Download File
+                        </a>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -107,29 +119,29 @@
                 </div>
                 <div class="card-body">
                     <div class="d-flex gap-2 mb-3">
-                        <button class="btn btn-outline-success flex-grow-1" onclick="voteFile({{ file.id }}, 'like')">
-                            <i class="fas fa-thumbs-up me-1"></i> <span id="likes-count">{{ file.likes or 5 }}</span>
+                        <button class="btn btn-outline-success flex-grow-1" onclick="voteFile('like')">
+                            <i class="fas fa-thumbs-up me-1"></i> <span id="likes-count">{{ file.likes }}</span>
                         </button>
-                        <button class="btn btn-outline-danger flex-grow-1" onclick="voteFile({{ file.id }}, 'dislike')">
-                            <i class="fas fa-thumbs-down me-1"></i> <span id="dislikes-count">{{ file.dislikes or 3 }}</span>
+                        <button class="btn btn-outline-danger flex-grow-1" onclick="voteFile('dislike')">
+                            <i class="fas fa-thumbs-down me-1"></i> <span id="dislikes-count">{{ file.dislikes }}</span>
                         </button>
                     </div>
 
                     <div class="comments-section">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h6 class="small mb-0">Comments ({{ file.comments|length if file.comments else 1 }})</h6>
+                            <h6 class="small mb-0">Comments (<span id="comment-count">{{ file.comments|length }}</span>)</h6>
                             <button class="btn btn-link btn-sm text-decoration-none p-0" onclick="toggleComments()">
                                 <i class="fas fa-comments me-1"></i> <span id="comments-toggle">Hide</span>
                             </button>
                         </div>
                         
                         <div id="comments-container">
-                            <form onsubmit="addComment(event, {{ file.id }})" class="mb-3">
+                            <form onsubmit="addComment(event)" class="mb-3" id="comment-form">
                                 <div class="mb-2">
-                                    <input type="text" class="form-control form-control-sm" placeholder="Your name" required>
+                                    <input type="text" id="comment-author" class="form-control form-control-sm" placeholder="Your name" required>
                                 </div>
                                 <div class="mb-2">
-                                    <textarea class="form-control form-control-sm" rows="2" placeholder="Add a comment..." required></textarea>
+                                    <textarea id="comment-content" class="form-control form-control-sm" rows="2" placeholder="Add a comment..." required></textarea>
                                 </div>
                                 <button type="submit" class="btn btn-primary btn-sm w-100">
                                     <i class="fas fa-paper-plane me-1"></i> Post
@@ -137,13 +149,15 @@
                             </form>
 
                             <div id="comments-list" class="small">
+                                {% for comment in file.comments|reverse %}
                                 <div class="comment border-bottom py-2">
                                     <div class="d-flex justify-content-between">
-                                        <strong>tester</strong>
-                                        <span class="text-muted">2026-02-07 08:55</span>
+                                        <strong>{{ comment.author_name }}</strong>
+                                        <span class="text-muted">{{ comment.created_at }}</span>
                                     </div>
-                                    <p class="mb-0">testing weather comment is working or not.</p>
+                                    <p class="mb-0">{{ comment.content }}</p>
                                 </div>
+                                {% endfor %}
                             </div>
                         </div>
                     </div>
@@ -153,6 +167,7 @@
     </div>
 </div>
 
+{% if ext == 'pdf' %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
     const url = "{{ url_for('download_file', file_id=file.id) }}";
@@ -176,18 +191,69 @@
         pdfDoc = doc;
         document.getElementById('pageCount').textContent = doc.numPages;
         renderPage(pageNum);
+    }).catch(err => {
+        console.error('PDF error:', err);
     });
 
     function prevPage() { if (pageNum <= 1) return; pageNum--; renderPage(pageNum); }
     function nextPage() { if (pageNum >= pdfDoc.numPages) return; pageNum++; renderPage(pageNum); }
     function zoomIn() { scale += 0.2; renderPage(pageNum); document.getElementById('zoomLevel').textContent = Math.round(scale * 100) + '%'; }
     function zoomOut() { if (scale <= 0.5) return; scale -= 0.2; renderPage(pageNum); document.getElementById('zoomLevel').textContent = Math.round(scale * 100) + '%'; }
-    function shareFile() { navigator.clipboard.writeText(window.location.href); alert('Link copied!'); }
+</script>
+{% endif %}
+
+<script>
+    function shareFile() { 
+        navigator.clipboard.writeText(window.location.href); 
+        alert('Link copied!'); 
+    }
+    
     function toggleComments() { 
         const container = document.getElementById('comments-container');
         const toggle = document.getElementById('comments-toggle');
         container.classList.toggle('d-none');
         toggle.textContent = container.classList.contains('d-none') ? 'Show' : 'Hide';
+    }
+
+    async function voteFile(type) {
+        const res = await fetch("{{ url_for('vote', file_id=file.id) }}", {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({type})
+        });
+        const data = await res.json();
+        if (data.success) {
+            document.getElementById('likes-count').textContent = data.likes;
+            document.getElementById('dislikes-count').textContent = data.dislikes;
+        }
+    }
+
+    async function addComment(e) {
+        e.preventDefault();
+        const author = document.getElementById('comment-author').value;
+        const content = document.getElementById('comment-content').value;
+        
+        const res = await fetch("{{ url_for('add_comment', file_id=file.id) }}", {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({author, content})
+        });
+        const data = await res.json();
+        if (data.success) {
+            const list = document.getElementById('comments-list');
+            const comment = data.comment;
+            const html = `
+                <div class="comment border-bottom py-2">
+                    <div class="d-flex justify-content-between">
+                        <strong>${comment.author_name}</strong>
+                        <span class="text-muted">${comment.created_at}</span>
+                    </div>
+                    <p class="mb-0">${comment.content}</p>
+                </div>`;
+            list.insertAdjacentHTML('afterbegin', html);
+            document.getElementById('comment-form').reset();
+            document.getElementById('comment-count').textContent = parseInt(document.getElementById('comment-count').textContent) + 1;
+        }
     }
 </script>
 {% endblock %}

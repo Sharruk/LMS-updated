@@ -6,7 +6,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, sen
 from werkzeug.utils import secure_filename
 from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, Subject, File, User
+from models import db, Subject, File, User, Comment
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG)
@@ -35,7 +35,7 @@ with app.app_context():
 UPLOAD_FOLDER = 'uploads'
 DATA_FILE = 'data.json'
 MAX_FILE_SIZE = None
-ALLOWED_EXTENSIONS = {'pdf'}
+ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'csv', 'txt', 'jpg', 'png', 'jpeg', 'mp4'}
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -50,11 +50,11 @@ def load_data():
                 data = json.load(f)
         else:
             data = {"classes": {}, "files": [], "exam_categories": []}
-
+        
         # Ensure standard hierarchy exists
         if 'classes' not in data:
             data['classes'] = {}
-        
+            
         # Standard subjects for Class 9 & 10
         common_subjects = {
             "tamil": "Tamil",
@@ -210,53 +210,60 @@ def upload():
             flash('No file selected', 'error')
             return redirect(request.url)
         
-        if file and file.filename.lower().endswith('.pdf'):
-            class_level = request.form.get('class')
-            subject_id = request.form.get('subject')
-            exam_type = request.form.get('exam_type')
-            year = request.form.get('year')
-            description = request.form.get('description')
-            
-            subject = Subject.query.get(subject_id)
-            if not subject:
-                flash('Invalid subject', 'error')
-                return redirect(request.url)
-
-            filename = secure_filename(file.filename)
-            timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
-            stored_filename = f"{timestamp}_{filename}"
-            file_path = os.path.join(app.config['UPLOAD_FOLDER'], stored_filename)
-            file.save(file_path)
-            
-            file_size = os.path.getsize(file_path)
-            size_str = f"{file_size / (1024*1024):.1f} MB"
-            
-            new_file = File(
-                filename=stored_filename,
-                original_filename=file.filename,
-                custom_filename=filename,
-                class_level=class_level,
-                subject_id=subject.id,
-                subject_name=subject.name,
-                exam_type=exam_type,
-                year=year,
-                description=description,
-                file_path=file_path,
-                size=size_str
-            )
-            db.session.add(new_file)
-            db.session.commit()
-            
-            # Sync with data.json for compatibility if needed
-            data = load_data()
-            data['files'].append(new_file.to_dict())
-            save_data(data)
-            
-            flash('File uploaded successfully!', 'success')
-            return redirect(url_for('admin_dashboard'))
-        else:
-            flash('Only PDF files are allowed', 'error')
+        class_level = request.form.get('class')
+        subject_id = request.form.get('subject')
+        exam_type = request.form.get('exam_type')
+        year = request.form.get('year')
+        description = request.form.get('description', '')
+        custom_filename = request.form.get('custom_filename', '').strip()
+        
+        subject = Subject.query.get(subject_id)
+        if not subject:
+            flash('Invalid subject', 'error')
             return redirect(request.url)
+
+        original_filename = secure_filename(file.filename)
+        extension = os.path.splitext(original_filename)[1]
+        
+        timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
+        stored_filename = f"{timestamp}_{original_filename}"
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], stored_filename)
+        file.save(file_path)
+        
+        # Determine display filename
+        final_custom_name = custom_filename if custom_filename else os.path.splitext(file.filename)[0]
+        if not final_custom_name.lower().endswith(extension.lower()):
+            final_custom_name += extension
+            
+        file_size = os.path.getsize(file_path)
+        if file_size < 1024 * 1024:
+            size_str = f"{file_size / 1024:.1f} KB"
+        else:
+            size_str = f"{file_size / (1024*1024):.1f} MB"
+        
+        new_file = File(
+            filename=stored_filename,
+            original_filename=file.filename,
+            custom_filename=final_custom_name,
+            class_level=class_level,
+            subject_id=subject.id,
+            subject_name=subject.name,
+            exam_type=exam_type,
+            year=year,
+            description=description,
+            file_path=file_path,
+            size=size_str
+        )
+        db.session.add(new_file)
+        db.session.commit()
+        
+        # Sync with data.json
+        data = load_data()
+        data['files'].append(new_file.to_dict())
+        save_data(data)
+        
+        flash('File uploaded successfully!', 'success')
+        return redirect(url_for('admin_dashboard'))
 
     subjects = Subject.query.all()
     exam_types = [
@@ -313,6 +320,31 @@ def toggle_visibility(file_id):
     
     return redirect(url_for('manage_files'))
 
+@app.route('/api/comment/<int:file_id>', methods=['POST'])
+def add_comment(file_id):
+    data = request.json
+    author = data.get('author')
+    content = data.get('content')
+    if not author or not content:
+        return jsonify({'success': False, 'message': 'Missing fields'}), 400
+        
+    comment = Comment(file_id=file_id, author_name=author, content=content)
+    db.session.add(comment)
+    db.session.commit()
+    return jsonify({'success': True, 'comment': comment.to_dict()})
+
+@app.route('/api/vote/<int:file_id>', methods=['POST'])
+def vote(file_id):
+    data = request.json
+    vote_type = data.get('type')
+    file_item = File.query.get_or_404(file_id)
+    if vote_type == 'like':
+        file_item.likes += 1
+    elif vote_type == 'dislike':
+        file_item.dislikes += 1
+    db.session.commit()
+    return jsonify({'success': True, 'likes': file_item.likes, 'dislikes': file_item.dislikes})
+
 @app.route('/search')
 def search():
     return render_template('search.html')
@@ -321,7 +353,7 @@ def search():
 def file_detail(file_id):
     data = load_data()
     file_found = next((f for f in data['files'] if f['id'] == file_id), None)
-    if not file_found or (not file_found.get('is_published', True) and not is_admin()):
+    if not file_found or (not file_found.get('visible', True) and not is_admin()):
         flash('File not found', 'error')
         return redirect(url_for('index'))
     return render_template('file_detail.html', file=file_found)
@@ -330,7 +362,7 @@ def file_detail(file_id):
 def download_file(file_id):
     data = load_data()
     file_found = next((f for f in data['files'] if f['id'] == file_id), None)
-    if not file_found or (not file_found.get('is_published', True) and not is_admin()):
+    if not file_found or (not file_found.get('visible', True) and not is_admin()):
         flash('Access denied', 'error')
         return redirect(url_for('index'))
     return send_from_directory(app.config['UPLOAD_FOLDER'], file_found['filename'])
