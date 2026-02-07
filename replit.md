@@ -1,33 +1,30 @@
 # TN State Board Portal
 
 ## Overview
-A Tamil Nadu State Board Question Papers & Answer Keys Portal built with Flask. Students can browse question papers organized by class (9, 10, 11, 12), subject, and exam type. Admins can upload and manage files.
+A Tamil Nadu State Board Question Papers & Answer Keys Portal built with Flask. Students can browse question papers by class (9-12), subject, and exam type. Admins can upload/manage files and moderate comments.
 
 ## Recent Changes
-- 2026-02-07: Completed project import to Replit environment. Set up PostgreSQL database, installed dependencies, configured workflow.
+- 2026-02-07: Completed project import to Replit environment. Installed dependencies, set up PostgreSQL database, configured workflow.
 
-## Project Architecture
-- **Framework**: Flask (Python 3.11)
-- **Database**: PostgreSQL via SQLAlchemy ORM
+## Architecture
+- **Backend**: Flask (Python 3.11) with SQLAlchemy ORM
+- **Database**: PostgreSQL (Replit built-in)
+- **Frontend**: Server-rendered templates (Jinja2) with Bootstrap
 - **Server**: Gunicorn on port 5000
-- **Templates**: Jinja2 (in `templates/`)
-- **Static Assets**: CSS and JS (in `static/`)
 
-### Key Files
-- `app.py` - Main application with routes, admin login, file upload/download
-- `models.py` - Database models (Subject, File, Comment, User)
+## Key Files
+- `app.py` - Main Flask application with all routes
+- `models.py` - SQLAlchemy models (Subject, File, Comment, User)
 - `main.py` - Entry point for gunicorn
-- `templates/` - HTML templates (base, index, class_view, subject_view, etc.)
-- `static/` - CSS and JavaScript files
+- `templates/` - Jinja2 HTML templates
+- `static/` - CSS and JS assets
 - `uploads/` - Uploaded files directory
 
-### Features
-- Browse question papers by Class > Subject > Exam Type
-- Admin panel (session-based auth) for file management
-- File upload with metadata (class, subject, exam type, year)
+## Features
+- Browse classes 9-12 with subjects
+- View exam categories (Unit Tests, Midterms, Quarterly, Half Yearly, Annual)
+- File upload/download system
+- Admin dashboard with file management
+- Comment system on files
+- Like/dislike voting
 - Search functionality
-- Like/dislike and comment system on files
-- File visibility toggle for admins
-
-## User Preferences
-- None recorded yet
