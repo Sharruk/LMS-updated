@@ -1,5 +1,6 @@
 email-validator
 flask
+flask-login
 flask-sqlalchemy
 gunicorn
 matplotlib
@@ -11,18 +12,7 @@ sqlalchemy
 werkzeug
 email-validator
 flask
-flask-sqlalchemy
-gunicorn
-psycopg2-binary
-sqlalchemy
-werkzeug
-email_validator
-flask
-flask-sqlalchemy
-gunicorn
-psycopg2-binary
-email-validator
-flask
+flask-login
 flask-sqlalchemy
 gunicorn
 matplotlib
