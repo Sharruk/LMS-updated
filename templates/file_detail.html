@@ -113,6 +113,11 @@
                         
                         <dt class="col-sm-5">Uploaded:</dt>
                         <dd class="col-sm-7 text-muted">{{ file.upload_date }}</dd>
+
+                        {% if file.description %}
+                        <dt class="col-sm-5">Description:</dt>
+                        <dd class="col-sm-7 text-muted">{{ file.description }}</dd>
+                        {% endif %}
                     </dl>
                 </div>
             </div>
@@ -230,6 +235,8 @@
         if (data.success) {
             document.getElementById('likes-count').textContent = data.likes;
             document.getElementById('dislikes-count').textContent = data.dislikes;
+        } else {
+            alert(data.message);
         }
     }
 
@@ -258,6 +265,8 @@
             list.insertAdjacentHTML('afterbegin', html);
             document.getElementById('comment-form').reset();
             document.getElementById('comment-count').textContent = parseInt(document.getElementById('comment-count').textContent) + 1;
+        } else {
+            alert(data.message);
         }
     }
 </script>

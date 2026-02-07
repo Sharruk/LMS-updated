@@ -351,6 +351,8 @@ def toggle_visibility(file_id):
 
 @app.route('/api/comment/<int:file_id>', methods=['POST'])
 def add_comment(file_id):
+    if session.get(f'commented_{file_id}'):
+        return jsonify({'success': False, 'message': 'You have already commented on this file'}), 400
     data = request.json
     author = data.get('author')
     content = data.get('content')
@@ -359,10 +361,13 @@ def add_comment(file_id):
     comment = Comment(file_id=file_id, author_name=author, content=content)
     db.session.add(comment)
     db.session.commit()
+    session[f'commented_{file_id}'] = True
     return jsonify({'success': True, 'comment': comment.to_dict()})
 
 @app.route('/api/vote/<int:file_id>', methods=['POST'])
 def vote(file_id):
+    if session.get(f'voted_{file_id}'):
+        return jsonify({'success': False, 'message': 'You have already voted on this file'}), 400
     data = request.json
     vote_type = data.get('type')
     file_item = File.query.get_or_404(file_id)
@@ -371,6 +376,7 @@ def vote(file_id):
     elif vote_type == 'dislike':
         file_item.dislikes += 1
     db.session.commit()
+    session[f'voted_{file_id}'] = True
     return jsonify({'success': True, 'likes': file_item.likes, 'dislikes': file_item.dislikes})
 
 @app.route("/search")

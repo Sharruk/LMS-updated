@@ -88,7 +88,7 @@ document.getElementById('class').addEventListener('change', function() {
         options.forEach(option => {
             if (option.value === "") {
                 option.style.display = 'block';
-            } else if (option.getAttribute('data-class') === classLevel) {
+            } else if (String(option.getAttribute('data-class')) === String(classLevel)) {
                 option.style.display = 'block';
                 found = true;
             } else {
