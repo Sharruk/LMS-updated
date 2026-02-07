@@ -424,6 +424,30 @@
       "likes": 4,
       "dislikes": 5,
       "comments": []
+    },
+    {
+      "id": 9,
+      "filename": "DM_assignment_1.pdf",
+      "original_filename": "DM assignment 1.pdf",
+      "custom_filename": "DM_assignment_1.pdf",
+      "course_type": "ug",
+      "department": "cse",
+      "semester": "1",
+      "category": "CAT",
+      "subject": "AI",
+      "description": "",
+      "size": "6.6 MB",
+      "upload_date": "2026-02-07 08:55:15",
+      "file_path": "uploads/DM_assignment_1.pdf",
+      "likes": 5,
+      "dislikes": 3,
+      "comments": [
+        {
+          "name": "tester",
+          "comment": "testing wheather comment is working or not.",
+          "date": "2026-02-07 08:55"
+        }
+      ]
     }
   ],
   "syllabus_files": []

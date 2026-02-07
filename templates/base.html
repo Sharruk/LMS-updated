@@ -31,55 +31,22 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('calculators_home') }}">
-                            <i class="fas fa-calculator me-1"></i> Calculators
-                        </a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('search') }}">
-                            <i class="fas fa-search me-1"></i> Search Files
+                            <i class="fas fa-search me-1"></i> Search Papers
+                        </a>
+                    </li>
+                    {% if session.get('is_admin') %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('admin_dashboard') }}">
+                            <i class="fas fa-user-shield me-1"></i> Admin
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('community') }}">
-                            <i class="fas fa-comments me-1"></i> Community
+                        <a class="nav-link" href="{{ url_for('admin_logout') }}">
+                            <i class="fas fa-sign-out-alt me-1"></i> Logout
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('clubs') }}">
-                            <i class="fas fa-users me-1"></i> Student Clubs
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('canteen') }}">
-                            <i class="fas fa-utensils me-1"></i> Canteen
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('campus_places') }}">
-                            <i class="fas fa-map-marker-alt me-1"></i> Campus Places
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('hostel_info') }}">
-                            <i class="fas fa-building me-1"></i> Hostel Info
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('upcoming_events') }}">
-                            <i class="fas fa-calendar-alt me-1"></i> Events
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('bus_routes') }}">
-                            <i class="fas fa-bus me-1"></i> Bus Routes
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('upload') }}">
-                            <i class="fas fa-plus me-1"></i> Upload
-                        </a>
-                    </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>

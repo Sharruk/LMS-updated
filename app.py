@@ -284,9 +284,50 @@ def get_file_size(filepath):
         size /= 1024.0
     return f"{size:.1f} TB"
 
+# Admin access configuration
+ADMIN_SECRET_PATH = os.environ.get("ADMIN_SECRET_PATH", "admin-secret-route")
+
+def is_admin():
+    """Check if the current session belongs to an admin"""
+    return session.get('is_admin', False)
+
+@app.route(f'/{ADMIN_SECRET_PATH}', methods=['GET', 'POST'])
+def admin_login():
+    """Secret admin login route"""
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        user = User.query.filter_by(username=username).first()
+        if user and check_password_hash(user.password_hash, password) and user.is_admin:
+            session['is_admin'] = True
+            session['username'] = username
+            flash('Admin login successful!', 'success')
+            return redirect(url_for('admin_dashboard'))
+        else:
+            flash('Invalid admin credentials', 'error')
+            
+    return render_template('admin/login.html')
+
+@app.route(f'/{ADMIN_SECRET_PATH}/dashboard')
+def admin_dashboard():
+    """Admin dashboard for managing the portal"""
+    if not is_admin():
+        return redirect(url_for('index'))
+    return render_template('admin/dashboard.html')
+
+@app.route('/admin/logout')
+def admin_logout():
+    """Logout admin"""
+    session.pop('is_admin', None)
+    session.pop('username', None)
+    flash('Logged out successfully', 'success')
+    return redirect(url_for('index'))
+
 @app.route('/')
 def index():
-    """Homepage showing main sections: Question Papers and Syllabus"""
+    """Homepage showing main sections: Question Papers and Answer Keys"""
+    # Load featured classes/subjects
     return render_template('index.html')
 
 @app.route('/materials')
