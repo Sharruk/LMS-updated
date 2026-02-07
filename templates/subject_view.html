@@ -26,11 +26,19 @@
             <div class="card-body pt-0">
                 <div class="list-group list-group-flush">
                     {% for exam_type in category.types %}
+                    {% set count = category.counts[exam_type]|default(0) %}
+                    {% if count > 0 %}
                     <a href="{{ url_for('view_exam_type', class_id=class_id, subject_id=subject_id, exam_type_slug=exam_type.lower().replace(' ', '-')) }}" 
                        class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-0">
                         {{ exam_type }}
-                        <i class="fas fa-chevron-right text-muted small"></i>
+                        <span class="badge bg-primary rounded-pill">{{ count }}</span>
                     </a>
+                    {% else %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center px-0 text-muted opacity-50">
+                        {{ exam_type }}
+                        <span class="badge bg-secondary rounded-pill">0</span>
+                    </div>
+                    {% endif %}
                     {% endfor %}
                 </div>
             </div>
