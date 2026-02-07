@@ -35,3 +35,13 @@ Pillow
 psycopg2-binary
 sqlalchemy
 werkzeug
+email-validator
+flask
+flask-sqlalchemy
+gunicorn
+matplotlib
+numpy
+Pillow
+psycopg2-binary
+sqlalchemy
+werkzeug
