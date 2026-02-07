@@ -1,80 +1,38 @@
 {% extends "base.html" %}
 
-{% block title %}TN State Board Question Papers & Answer Keys{% endblock %}
-
-{% block breadcrumb %}
-<nav aria-label="breadcrumb" class="bg-light py-2">
-    <div class="container">
-        <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item active">
-                <i class="fas fa-home me-1"></i>Home
-            </li>
-        </ol>
-    </div>
-</nav>
-{% endblock %}
-
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <div class="text-center mb-5">
-            <h1 class="display-5 mb-2">
-                <i class="fas fa-file-pdf text-primary me-3"></i>
-                TN State Board Question Papers
-            </h1>
-            <p class="text-muted lead">Download 10th and 12th Standard Question Papers & Answer Keys</p>
-        </div>
+<div class="text-center py-5 bg-primary text-white rounded shadow-sm mb-5">
+    <h1 class="display-4">Tamil Nadu State Board</h1>
+    <p class="lead">Question Papers & Answer Keys Portal</p>
+    <div class="mt-4">
+        <a href="#classes" class="btn btn-outline-light btn-lg">Explore Classes</a>
     </div>
 </div>
 
-<div class="row g-4 justify-content-center">
-    <!-- 10th Standard Section -->
-    <div class="col-lg-4 col-md-6">
-        <div class="card h-100 shadow-lg hover-card border-0">
-            <div class="card-body text-center p-4">
-                <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                    <i class="fas fa-book-reader fa-2x text-primary"></i>
+<section id="classes" class="py-5">
+    <h2 class="text-center mb-5">Choose Your Class</h2>
+    <div class="row g-4">
+        {% for id, class in classes.items() %}
+        <div class="col-md-3">
+            <div class="card h-100 border-0 shadow-sm hover-card">
+                <div class="card-body text-center p-4">
+                    <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 70px; height: 70px;">
+                        <i class="fas fa-graduation-cap fa-2x text-primary"></i>
+                    </div>
+                    <h3 class="h5">{{ class.name }}</h3>
+                    <a href="{{ url_for('view_class', class_id=id) }}" class="btn btn-primary mt-3">View Materials</a>
                 </div>
-                <h4 class="card-title mb-3 text-primary">10th Standard</h4>
-                <p class="card-text text-muted mb-4">
-                    Access SSLC Question Papers and Answer Keys for all subjects including Tamil, English, Maths, Science, and Social Science.
-                </p>
-                <a href="{{ url_for('course_type', course_type_id='ug') }}" class="btn btn-primary w-100">
-                    <i class="fas fa-search me-2"></i>
-                    Browse 10th Papers
-                </a>
             </div>
         </div>
+        {% endfor %}
     </div>
+</section>
 
-    <!-- 12th Standard Section -->
-    <div class="col-lg-4 col-md-6">
-        <div class="card h-100 shadow-lg hover-card border-0">
-            <div class="card-body text-center p-4">
-                <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                    <i class="fas fa-user-graduate fa-2x text-success"></i>
-                </div>
-                <h4 class="card-title mb-3 text-success">12th Standard</h4>
-                <p class="card-text text-muted mb-4">
-                    Download HSC (+2) Question Papers and Answer Keys for Science, Commerce, and Vocational streams.
-                </p>
-                <a href="{{ url_for('course_type', course_type_id='pg') }}" class="btn btn-success w-100">
-                    <i class="fas fa-search me-2"></i>
-                    Browse 12th Papers
-                </a>
-            </div>
-        </div>
+<section class="py-5 bg-light rounded shadow-sm">
+    <div class="container text-center">
+        <h2>Latest Question Papers</h2>
+        <p class="text-muted">Recently uploaded question papers and answer keys</p>
+        <!-- Logic to list recent files will go here -->
     </div>
-</div>
-
-<style>
-.hover-card {
-    transition: all 0.3s ease-in-out;
-}
-
-.hover-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.1) !important;
-}
-</style>
+</section>
 {% endblock %}
