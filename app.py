@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 # How to set SECRET_KEY in Replit Secrets:
 # Left side -> Click 🔒 Secrets -> Add Name: SECRET_KEY, Value: your-random-secret
-app.secret_key = os.environ.get("SECRET_KEY", "dev-secret")
+app.secret_key = os.environ.get("SESSION_SECRET")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 # Database configuration for Render/Replit
