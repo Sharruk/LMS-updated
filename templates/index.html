@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}College Materials & PYQs Portal{% endblock %}
+{% block title %}TN State Board Question Papers & Answer Keys{% endblock %}
 
 {% block breadcrumb %}
 <nav aria-label="breadcrumb" class="bg-light py-2">
@@ -17,169 +17,50 @@
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center mb-5">
-            <div>
-                <h1 class="display-5 mb-2">
-                    <i class="fas fa-graduation-cap text-primary me-3"></i>
-                    College Materials & PYQs Portal
-                </h1>
-                <p class="text-muted lead">Your academic resource hub for study materials and previous year question papers</p>
-            </div>
-            <a href="{{ url_for('upload') }}" class="btn btn-primary btn-lg">
-                <i class="fas fa-plus me-2"></i>Upload Files
-            </a>
+        <div class="text-center mb-5">
+            <h1 class="display-5 mb-2">
+                <i class="fas fa-file-pdf text-primary me-3"></i>
+                TN State Board Question Papers
+            </h1>
+            <p class="text-muted lead">Download 10th and 12th Standard Question Papers & Answer Keys</p>
         </div>
     </div>
 </div>
 
 <div class="row g-4 justify-content-center">
-    <!-- Question Papers Section -->
-    <div class="col-lg-3 col-md-6">
+    <!-- 10th Standard Section -->
+    <div class="col-lg-4 col-md-6">
         <div class="card h-100 shadow-lg hover-card border-0">
             <div class="card-body text-center p-4">
                 <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                    <i class="fas fa-file-alt fa-2x text-primary"></i>
+                    <i class="fas fa-book-reader fa-2x text-primary"></i>
                 </div>
-                <h4 class="card-title mb-3 text-primary">Question Papers</h4>
+                <h4 class="card-title mb-3 text-primary">10th Standard</h4>
                 <p class="card-text text-muted mb-4">
-                    Access previous year question papers, CAT, ESE, and practical materials organized by department and semester.
+                    Access SSLC Question Papers and Answer Keys for all subjects including Tamil, English, Maths, Science, and Social Science.
                 </p>
-                <a href="{{ url_for('materials_home') }}" class="btn btn-primary w-100">
-                    <i class="fas fa-arrow-right me-2"></i>
-                    Browse Question Papers
+                <a href="{{ url_for('course_type', course_type_id='ug') }}" class="btn btn-primary w-100">
+                    <i class="fas fa-search me-2"></i>
+                    Browse 10th Papers
                 </a>
             </div>
         </div>
     </div>
 
-    <!-- Syllabus Section -->
-    <div class="col-lg-3 col-md-6">
+    <!-- 12th Standard Section -->
+    <div class="col-lg-4 col-md-6">
         <div class="card h-100 shadow-lg hover-card border-0">
             <div class="card-body text-center p-4">
                 <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                    <i class="fas fa-book fa-2x text-success"></i>
+                    <i class="fas fa-user-graduate fa-2x text-success"></i>
                 </div>
-                <h4 class="card-title mb-3 text-success">Syllabus</h4>
+                <h4 class="card-title mb-3 text-success">12th Standard</h4>
                 <p class="card-text text-muted mb-4">
-                    Download complete syllabus documents for all regulations and departments across different course types.
+                    Download HSC (+2) Question Papers and Answer Keys for Science, Commerce, and Vocational streams.
                 </p>
-                <a href="{{ url_for('syllabus_home') }}" class="btn btn-success w-100">
-                    <i class="fas fa-arrow-right me-2"></i>
-                    Browse Syllabus
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Student Clubs Section -->
-    <div class="col-lg-3 col-md-6">
-        <div class="card h-100 shadow-lg hover-card border-0">
-            <div class="card-body text-center p-4">
-                <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                    <i class="fas fa-users fa-2x text-warning"></i>
-                </div>
-                <h4 class="card-title mb-3 text-warning">Student Clubs</h4>
-                <p class="card-text text-muted mb-4">
-                    Discover and connect with student organizations on campus. Find clubs that match your interests and activities.
-                </p>
-                <a href="{{ url_for('clubs') }}" class="btn btn-warning w-100">
-                    <i class="fas fa-arrow-right me-2"></i>
-                    View Student Clubs
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Campus Places Section -->
-    <div class="col-lg-3 col-md-6">
-        <div class="card h-100 shadow-lg hover-card border-0">
-            <div class="card-body text-center p-4">
-                <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                    <i class="fas fa-map-marker-alt fa-2x text-primary"></i>
-                </div>
-                <h4 class="card-title mb-3 text-primary">Campus Places</h4>
-                <p class="card-text text-muted mb-4">
-                    Discover key locations around campus with visual and map references for students and visitors.
-                </p>
-                <a href="{{ url_for('campus_places') }}" class="btn btn-primary w-100">
-                    <i class="fas fa-arrow-right me-2"></i>
-                    View Places
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Canteen Section -->
-    <div class="col-lg-3 col-md-6">
-        <div class="card h-100 shadow-lg hover-card border-0">
-            <div class="card-body text-center p-4">
-                <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                    <i class="fas fa-utensils fa-2x text-success"></i>
-                </div>
-                <h4 class="card-title mb-3 text-success">SSN Canteens</h4>
-                <p class="card-text text-muted mb-4">
-                    Explore the different canteens available at SSN College of Engineering, Chennai.
-                </p>
-                <a href="{{ url_for('canteen') }}" class="btn btn-success w-100">
-                    <i class="fas fa-arrow-right me-2"></i>
-                    View Canteens
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Upcoming Events Section -->
-    <div class="col-lg-3 col-md-6">
-        <div class="card h-100 shadow-lg hover-card border-0">
-            <div class="card-body text-center p-4">
-                <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                    <i class="fas fa-calendar-alt fa-2x text-success"></i>
-                </div>
-                <h4 class="card-title mb-3 text-success">Upcoming Events</h4>
-                <p class="card-text text-muted mb-4">
-                    Stay updated with all SSN College events and activities.
-                </p>
-                <a href="{{ url_for('upcoming_events') }}" class="btn btn-success w-100">
-                    <i class="fas fa-arrow-right me-2"></i>
-                    View Events
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Hostel Information Section -->
-    <div class="col-lg-3 col-md-6">
-        <div class="card h-100 shadow-lg hover-card border-0">
-            <div class="card-body text-center p-4">
-                <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                    <i class="fas fa-building fa-2x text-warning"></i>
-                </div>
-                <h4 class="card-title mb-3 text-warning">Hostel Information</h4>
-                <p class="card-text text-muted mb-4">
-                    Get complete details of SSN Hostels for students and parents.
-                </p>
-                <a href="{{ url_for('hostel_info') }}" class="btn btn-warning w-100">
-                    <i class="fas fa-arrow-right me-2"></i>
-                    View Hostels
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bus Routes Section -->
-    <div class="col-lg-3 col-md-6">
-        <div class="card h-100 shadow-lg hover-card border-0">
-            <div class="card-body text-center p-4">
-                <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                    <i class="fas fa-bus fa-2x text-info"></i>
-                </div>
-                <h4 class="card-title mb-3 text-info">Bus Routes</h4>
-                <p class="card-text text-muted mb-4">
-                    Access bus route information for new students and parents. Official routes sent via SSN email after admission.
-                </p>
-                <a href="{{ url_for('bus_routes') }}" class="btn btn-info w-100">
-                    <i class="fas fa-arrow-right me-2"></i>
-                    View Bus Routes
+                <a href="{{ url_for('course_type', course_type_id='pg') }}" class="btn btn-success w-100">
+                    <i class="fas fa-search me-2"></i>
+                    Browse 12th Papers
                 </a>
             </div>
         </div>

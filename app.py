@@ -426,7 +426,8 @@ def category_view(course_type_id, dept_id, semester_id, category):
         if f['course_type'].lower() == course_type_id.lower() and
            f['department'].lower() == dept_id.lower() and 
            f['semester'] == semester_id and 
-           f['category'].upper() == category.upper()
+           f['category'].upper() == category.upper() and
+           f.get('is_published', True)  # Filter unpublished papers
     ]
     
     course_data = data['course_types'][course_type_id]
@@ -485,6 +486,10 @@ def api_search():
                 
             # File type filter (assume QP for now)
             if file_type and file_type != 'QP':
+                continue
+
+            # Publication filter
+            if not file.get('is_published', True) and not is_admin():
                 continue
             
             # Add file type for display
