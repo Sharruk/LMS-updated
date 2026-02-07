@@ -1,43 +1,39 @@
-# Tamil Nadu State Board – Question Papers & Answer Keys Portal
+# TN Board Portal
 
 ## Overview
-A comprehensive web portal for school students (Class 9-12) to access and download previous year question papers and answer keys. The system follows a strict hierarchy: Class -> Subject -> Exam Type.
+A Flask web application for Tamil Nadu Board exam portal. It allows browsing classes (9-12), subjects, exam types, and downloading question papers. Includes admin functionality for uploading and managing files.
 
 ## Recent Changes
-- 2026-02-07: Refactored from College Portal to School Portal. Updated data structures to support Class-based navigation.
-- 2026-02-07: Initial Replit setup - fixed data.json compatibility, database initialization, and deployment configuration.
+- 2026-02-07: Initial migration to Replit environment completed
+- Installed all Python dependencies (Flask, SQLAlchemy, gunicorn, etc.)
+- PostgreSQL database created and connected
+- Deployment configured with gunicorn on autoscale
 
-## System Architecture
-
-### Backend
-- **Framework**: Flask 3.x (Python 3.11)
-- **Database**: PostgreSQL (Neon-backed via Replit) for user management and structured metadata (subjects, files, users)
-- **Data Storage**: JSON-based storage (`data.json`) for course hierarchy and file listings
-- **File Storage**: Local filesystem in `uploads/` directory
-- **ORM**: SQLAlchemy via Flask-SQLAlchemy
-
-### Frontend
-- Server-rendered HTML via Jinja2 templates
-- Bootstrap CSS for styling
-- Static files in `static/css/` and `static/js/`
+## Project Architecture
+- **Framework**: Flask (Python 3.11)
+- **Database**: PostgreSQL via SQLAlchemy ORM
+- **Server**: Gunicorn (WSGI)
+- **Templates**: Jinja2 (in `templates/` directory)
 
 ### Key Files
-- `main.py` - Entry point, runs Flask on 0.0.0.0:5000
-- `app.py` - Flask application with all routes and business logic
+- `main.py` - Entry point
+- `app.py` - Flask app configuration, routes, and logic
 - `models.py` - SQLAlchemy models (Subject, File, User)
-- `init_db.py` - Database initialization and seeding script
-- `data.json` - JSON data store for class hierarchy and file metadata
-- `templates/` - Jinja2 HTML templates
-- `static/` - CSS and JavaScript files
+- `templates/` - HTML templates
+- `uploads/` - Uploaded files directory
 
-### Database Models
-- **Subject**: Academic subjects with code, name, class_level, category
-- **File**: Uploaded files with metadata and subject associations
+### Models
+- **Subject**: Board exam subjects with class levels
+- **File**: Uploaded question papers/documents
 - **User**: Admin users for content management
 
-### Admin Access
-- Login route: `/admin` (configurable via ADMIN_SECRET_PATH env var)
-- Default credentials: admin / admin123
+### Routes
+- `/` - Homepage with class listing
+- `/class-<id>` - Class view with subjects
+- `/class-<id>/<subject>` - Subject view with exam categories
+- `/upload` - Admin file upload
+- `/search` - Search functionality
+- `/admin` - Admin login (configurable path via ADMIN_SECRET_PATH env var)
 
 ## User Preferences
-- No specific preferences recorded yet.
+- None recorded yet
