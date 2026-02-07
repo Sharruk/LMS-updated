@@ -84,17 +84,20 @@ document.getElementById('class').addEventListener('change', function() {
     
     if (classLevel) {
         subjectSelect.disabled = false;
-        let visibleCount = 0;
+        let found = false;
         options.forEach(option => {
             if (option.value === "") {
                 option.style.display = 'block';
             } else if (option.getAttribute('data-class') === classLevel) {
                 option.style.display = 'block';
-                visibleCount++;
+                found = true;
             } else {
                 option.style.display = 'none';
             }
         });
+        if (!found) {
+            subjectSelect.disabled = true;
+        }
     } else {
         subjectSelect.disabled = true;
         options.forEach(option => {

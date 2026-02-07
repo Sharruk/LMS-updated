@@ -134,12 +134,16 @@ def admin_login():
         username = request.form.get('username')
         password = request.form.get('password')
         user = User.query.filter_by(username=username).first()
-        if user and check_password_hash(user.password_hash, password) and user.is_admin:
-            session['is_admin'] = True
-            session['username'] = username
-            flash('Admin login successful!', 'success')
-            return redirect(url_for('admin_dashboard'))
-        flash('Invalid admin credentials', 'error')
+        if user and check_password_hash(user.password_hash, password):
+            if user.is_admin:
+                session['is_admin'] = True
+                session['username'] = username
+                flash('Admin login successful!', 'success')
+                return redirect(url_for('admin_dashboard'))
+            else:
+                flash('Access denied: Not an admin', 'error')
+        else:
+            flash('Invalid admin credentials', 'error')
     return render_template('admin/login.html')
 
 @app.route(f'/{ADMIN_SECRET_PATH}/dashboard')
@@ -197,27 +201,36 @@ def view_subject(class_id, subject_id):
         return redirect(url_for('view_class', class_id=class_id))
     
     subject_info = data['classes'][class_id]['subjects'][subject_id]
-    if isinstance(subject_info, str):
-        subject_name = subject_info
-        is_theory_only = False
-    else:
+    if isinstance(subject_info, dict):
         subject_name = subject_info.get('name')
         is_theory_only = subject_info.get('is_theory_only', False)
+    else:
+        subject_name = subject_info
+        is_theory_only = False
 
-    exam_categories = data.get('exam_categories', [])
+    exam_categories = [
+        {"name": "Unit Tests", "types": ["Unit Test 1", "Unit Test 2", "Unit Test 3", "Unit Test 4", "Unit Test 5"]},
+        {"name": "Midterm Tests", "types": ["Midterm Test 1", "Midterm Test 2"]},
+        {"name": "Quarterly Exam", "types": ["Quarterly Exam"]},
+        {"name": "Half Yearly Exam", "types": ["Half Yearly Exam"]},
+        {"name": "Practical Exam", "types": ["Practical Exam"]},
+        {"name": "Annual Exam", "types": ["Annual Exam", "Public Exam"]}
+    ]
     
     # Priority reordering
-    priority = ["Unit Tests", "Midterm Tests", "Quarterly Exam", "Half Yearly Exam", "Practical Exam", "Annual Exam"]
+    priority = ["Unit Tests", "Midterm Tests", "Quarterly Exam", "Half Yearly Exam", "Annual Exam", "Practical Exam"]
     exam_categories.sort(key=lambda x: priority.index(x['name']) if x['name'] in priority else 99)
 
-    # Filter out Practical Exam for theory-only subjects
-    if is_theory_only:
+    # Practical exam logic
+    practical_subjects = ["Science", "Physics", "Chemistry", "Biology", "Computer Science", "Computer Applications"]
+    if subject_name not in practical_subjects:
         exam_categories = [c for c in exam_categories if c['name'] != "Practical Exam"]
 
     # Calculate counts for each exam type
     files = data.get('files', [])
     for cat in exam_categories:
         cat['counts'] = {}
+        cat['total_count'] = 0
         for etype in cat.get('types', []):
             etype_slug = etype.lower().replace(' ', '-')
             count = len([f for f in files if 
@@ -226,6 +239,7 @@ def view_subject(class_id, subject_id):
                          etype_slug in f.get('exam_type', '').lower().replace(' ', '-') and
                          (f.get('visible', True) or is_admin())])
             cat['counts'][etype] = count
+            cat['total_count'] += count
 
     return render_template('subject_view.html', 
                          class_id=class_id, 

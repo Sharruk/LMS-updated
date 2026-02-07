@@ -16,7 +16,8 @@
 </div>
 
 <div class="row g-4">
-    {% for subject_id, subject_name in class_data.get('subjects', {}).items() %}
+    {% for subject_id, subject_info in class_data.get('subjects', {}).items() %}
+    {% set subject_name = subject_info.name if subject_info is mapping else subject_info %}
     <div class="col-md-4 col-lg-3">
         <a href="{{ url_for('view_subject', class_id=class_id, subject_id=subject_id) }}" class="text-decoration-none">
             <div class="card h-100 shadow-sm border-0 hover-card text-center p-3">

@@ -11,50 +11,43 @@
         </a>
     </div>
 
-    <div class="card shadow-sm">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>Date</th>
-                        <th>Author</th>
-                        <th>Comment</th>
-                        <th>File</th>
-                        <th class="text-end">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for comment in comments %}
-                    <tr>
-                        <td>
+    <div class="row">
+        {% for comment in comments %}
+        <div class="col-12 mb-3">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <h6 class="mb-0 fw-bold">{{ comment.author_name }}</h6>
                             <small class="text-muted">{{ comment.created_at.strftime('%d %b %Y, %H:%M') }}</small>
-                        </td>
-                        <td>
-                            <div class="fw-bold">{{ comment.author_name }}</div>
-                        </td>
-                        <td>
-                            <div class="text-wrap" style="max-width: 400px;">
-                                {{ comment.content }}
-                            </div>
-                        </td>
-                        <td>
-                            {% if comment.file %}
+                        </div>
+                        <span class="badge bg-{{ 'success' if not comment.hidden else 'secondary' }}">
+                            {{ 'Active' if not comment.hidden else 'Hidden' }}
+                        </span>
+                    </div>
+                    <p class="mb-2">{{ comment.content }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            On: {% if comment.file %}
                             <a href="{{ url_for('file_detail', file_id=comment.file.id) }}" target="_blank">
                                 {{ comment.file.custom_filename }}
-                            </a>
+                            </a> ({{ comment.file.class_level }}th / {{ comment.file.subject_name }})
                             {% else %}
-                            <span class="text-muted">Deleted File</span>
+                            <span class="text-danger">Deleted File</span>
                             {% endif %}
-                        </td>
-                        <td class="text-end">
-                            <form action="{{ url_for('delete_comment', comment_id=comment.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this comment?');">
+                        </small>
+                        <div class="btn-group">
+                            <form action="{{ url_for('delete_comment', comment_id=comment.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this comment?');">
                                 <button type="submit" class="btn btn-sm btn-outline-danger">
-                                    <i class="fas fa-trash-alt"></i>
+                                    <i class="fas fa-trash-alt me-1"></i>Delete
                                 </button>
                             </form>
-                        </td>
-                    </tr>
-                    {% else %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
                     <tr>
                         <td colspan="5" class="text-center py-5">
                             <div class="text-muted mb-2">
