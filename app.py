@@ -13,7 +13,9 @@ logging.basicConfig(level=logging.DEBUG)
 
 # Create the app
 app = Flask(__name__)
-app.secret_key = os.environ.get("SESSION_SECRET")
+# How to set SECRET_KEY in Replit Secrets:
+# Left side -> Click 🔒 Secrets -> Add Name: SECRET_KEY, Value: your-random-secret
+app.secret_key = os.environ.get("SECRET_KEY", "dev-secret")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 # Database configuration for Render/Replit
@@ -33,20 +35,6 @@ db.init_app(app)
 
 with app.app_context():
     db.create_all()
-    
-    # Create default admin if it doesn't exist (Change credentials via shell later)
-    admin_user = User.query.filter_by(username='admin').first()
-    if not admin_user:
-        hashed_password = generate_password_hash('admin123')
-        new_admin = User(
-            username='admin',
-            email='admin@example.com',
-            password_hash=hashed_password,
-            is_admin=True
-        )
-        db.session.add(new_admin)
-        db.session.commit()
-        logging.info("Default admin user created.")
 
 # Configuration
 UPLOAD_FOLDER = 'uploads'
@@ -115,6 +103,11 @@ def save_data(data):
     except Exception as e:
         logging.error(f"Error saving data: {e}")
 
+# How to set ADMIN_USERNAME and ADMIN_PASSWORD in Replit Secrets:
+# Left side -> Click 🔒 Secrets -> Add Name: ADMIN_USERNAME, Value: your-username
+# Left side -> Click 🔒 Secrets -> Add Name: ADMIN_PASSWORD, Value: your-password
+ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME", "admin")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "admin123")
 ADMIN_SECRET_PATH = os.environ.get("ADMIN_SECRET_PATH", "admin")
 
 def is_admin():
@@ -125,15 +118,13 @@ def admin_login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
-        user = User.query.filter_by(username=username).first()
-        if user and check_password_hash(user.password_hash, password):
-            if user.is_admin:
-                session['is_admin'] = True
-                session['username'] = username
-                flash('Admin login successful!', 'success')
-                return redirect(url_for('admin_dashboard'))
-            else:
-                flash('Access denied: Not an admin', 'error')
+        
+        # Admin check using environment variables
+        if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
+            session['is_admin'] = True
+            session['username'] = username
+            flash('Admin login successful!', 'success')
+            return redirect(url_for('admin_dashboard'))
         else:
             flash('Invalid admin credentials', 'error')
     return render_template('admin/login.html')
