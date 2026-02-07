@@ -205,17 +205,113 @@ def upload():
         flash('Access denied', 'error')
         return redirect(url_for('index'))
     if request.method == 'POST':
-        # Implementation for file upload
-        pass
+        file = request.files.get('file')
+        if not file or file.filename == '':
+            flash('No file selected', 'error')
+            return redirect(request.url)
+        
+        if file and file.filename.lower().endswith('.pdf'):
+            class_level = request.form.get('class')
+            subject_id = request.form.get('subject')
+            exam_type = request.form.get('exam_type')
+            year = request.form.get('year')
+            description = request.form.get('description')
+            
+            subject = Subject.query.get(subject_id)
+            if not subject:
+                flash('Invalid subject', 'error')
+                return redirect(request.url)
+
+            filename = secure_filename(file.filename)
+            timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
+            stored_filename = f"{timestamp}_{filename}"
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], stored_filename)
+            file.save(file_path)
+            
+            file_size = os.path.getsize(file_path)
+            size_str = f"{file_size / (1024*1024):.1f} MB"
+            
+            new_file = File(
+                filename=stored_filename,
+                original_filename=file.filename,
+                custom_filename=filename,
+                class_level=class_level,
+                subject_id=subject.id,
+                subject_name=subject.name,
+                exam_type=exam_type,
+                year=year,
+                description=description,
+                file_path=file_path,
+                size=size_str
+            )
+            db.session.add(new_file)
+            db.session.commit()
+            
+            # Sync with data.json for compatibility if needed
+            data = load_data()
+            data['files'].append(new_file.to_dict())
+            save_data(data)
+            
+            flash('File uploaded successfully!', 'success')
+            return redirect(url_for('admin_dashboard'))
+        else:
+            flash('Only PDF files are allowed', 'error')
+            return redirect(request.url)
+
+    subjects = Subject.query.all()
+    exam_types = [
+        "Unit Test 1", "Unit Test 2", "Unit Test 3", 
+        "Quarterly Exam", "Half Yearly Exam", "Revision Test", 
+        "Model Practical", "Practical Exam", "Annual Exam"
+    ]
+    return render_template('upload.html', subjects=subjects, exam_types=exam_types)
+
+@app.route('/admin/manage-files')
+def manage_files():
+    if not is_admin():
+        return redirect(url_for('index'))
+    files = File.query.all()
+    return render_template('admin/manage_files.html', files=files)
+
+@app.route('/admin/delete-file/<int:file_id>', methods=['POST'])
+def delete_file(file_id):
+    if not is_admin():
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 403
+    file_to_delete = File.query.get_or_404(file_id)
+    try:
+        if os.path.exists(file_to_delete.file_path):
+            os.remove(file_to_delete.file_path)
+        db.session.delete(file_to_delete)
+        db.session.commit()
+        
+        # Sync with data.json
+        data = load_data()
+        data['files'] = [f for f in data['files'] if f['id'] != file_id]
+        save_data(data)
+        
+        flash('File deleted successfully', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting file: {str(e)}', 'error')
+    return redirect(url_for('manage_files'))
+
+@app.route('/admin/toggle-visibility/<int:file_id>', methods=['POST'])
+def toggle_visibility(file_id):
+    if not is_admin():
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 403
+    file_item = File.query.get_or_404(file_id)
+    file_item.visible = not file_item.visible
+    db.session.commit()
+    
+    # Sync with data.json
     data = load_data()
-    # Handle both old and new data structure for template compatibility
-    exam_types = []
-    if 'exam_categories' in data:
-        for cat in data['exam_categories']:
-            exam_types.extend(cat['types'])
-    else:
-        exam_types = data.get('exam_types', [])
-    return render_template('upload.html', classes=data['classes'], exam_types=exam_types)
+    for f in data['files']:
+        if f['id'] == file_id:
+            f['visible'] = file_item.visible
+            break
+    save_data(data)
+    
+    return redirect(url_for('manage_files'))
 
 @app.route('/search')
 def search():

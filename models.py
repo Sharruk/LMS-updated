@@ -36,13 +36,17 @@ class File(db.Model):
     original_filename = db.Column(db.String(255), nullable=False)
     custom_filename = db.Column(db.String(255), nullable=False)
     class_level = db.Column(db.String(10), nullable=False)
-    category = db.Column(db.String(50), nullable=False)
     subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id'), nullable=True)
-    subject_name = db.Column(db.String(200), nullable=True)  # For backward compatibility
-    file_type = db.Column(db.String(20), nullable=False, default='QP')  # QP or Syllabus
-    size = db.Column(db.String(50), nullable=True)
+    subject_name = db.Column(db.String(200), nullable=True)
+    exam_type = db.Column(db.String(100), nullable=False)
+    year = db.Column(db.String(10), nullable=False)
+    description = db.Column(db.Text, nullable=True)
     file_path = db.Column(db.String(500), nullable=False)
+    size = db.Column(db.String(50), nullable=True)
     upload_date = db.Column(db.DateTime, default=datetime.utcnow)
+    visible = db.Column(db.Boolean, default=True)
+    likes = db.Column(db.Integer, default=0)
+    dislikes = db.Column(db.Integer, default=0)
     
     # Relationship
     subject = db.relationship('Subject', backref='files')
@@ -54,14 +58,18 @@ class File(db.Model):
             'original_filename': self.original_filename,
             'custom_filename': self.custom_filename,
             'class_level': self.class_level,
-            'category': self.category,
             'subject_id': self.subject_id,
             'subject_name': self.subject_name,
             'subject_code': self.subject.code if self.subject else None,
-            'file_type': self.file_type,
+            'exam_type': self.exam_type,
+            'year': self.year,
+            'description': self.description,
             'size': self.size,
             'file_path': self.file_path,
-            'upload_date': self.upload_date.isoformat() if self.upload_date else None
+            'upload_date': self.upload_date.isoformat() if self.upload_date else None,
+            'visible': self.visible,
+            'likes': self.likes,
+            'dislikes': self.dislikes
         }
     
     def __repr__(self):

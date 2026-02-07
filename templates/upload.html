@@ -1,19 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Upload Files - College Materials & PYQs Portal{% endblock %}
-
-{% block breadcrumb %}
-<nav aria-label="breadcrumb" class="bg-light py-2">
-    <div class="container">
-        <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item">
-                <a href="{{ url_for('index') }}"><i class="fas fa-home me-1"></i>Home</a>
-            </li>
-            <li class="breadcrumb-item active">Upload Files</li>
-        </ol>
-    </div>
-</nav>
-{% endblock %}
+{% block title %}Upload Files - School Portal{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -25,642 +12,79 @@
                 </h4>
             </div>
             <div class="card-body">
-                <form method="POST" enctype="multipart/form-data" id="uploadForm">
-                    <!-- Course Type Selection -->
-                    <div class="mb-3">
-                        <label for="course_type" class="form-label">Course Type</label>
-                        <select class="form-select" id="course_type" name="course_type" required>
-                            <option value="">Select Course Type</option>
-                            <option value="UG">UG (Under Graduate)</option>
-                            <option value="PG">PG (Post Graduate)</option>
-                            <option value="MBA">MBA</option>
-                        </select>
-                    </div>
-
-                    <!-- Department Selection -->
-                    <div class="mb-3">
-                        <label for="department" class="form-label">Department</label>
-                        <select class="form-select" id="department" name="department" required>
-                            <option value="">Select Department</option>
-                        </select>
-                    </div>
-
-                    <!-- Semester Selection -->
-                    <div class="mb-3">
-                        <label for="semester" class="form-label">Semester</label>
-                        <select class="form-select" id="semester" name="semester" required>
-                            <option value="">Select Semester</option>
-                        </select>
-                    </div>
-
-                    <!-- Category Selection -->
-                    <div class="mb-3">
-                        <label for="category" class="form-label">Category</label>
-                        <select class="form-select" id="category" name="category" required>
-                            <option value="">Select Category</option>
-                            <option value="CAT">CAT (Continuous Assessment Test)</option>
-                            <option value="ESE">ESE (End Semester Exam)</option>
-                            <option value="SAT">SAT (Semester Assessment Test)</option>
-                            <option value="Practical">Practical Files</option>
-                        </select>
-                    </div>
-
-                    <!-- Subject Input -->
-                    <div class="mb-3">
-                        <label for="subject" class="form-label">Subject Name</label>
-                        <input type="text" class="form-control" id="subject" name="subject" 
-                               placeholder="Enter subject name" required>
-                    </div>
-
-                    <!-- File Upload with Drag & Drop -->
-                    <div class="mb-3">
-                        <label for="file" class="form-label">Select File</label>
-                        <div class="drop-zone" id="dropZone" onclick="document.getElementById('file').click()">
-                            <div class="drop-zone-content">
-                                <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
-                                <h5 class="text-primary mb-2">Drag & Drop your file here</h5>
-                                <p class="text-muted mb-3">or click to browse</p>
-                                <button type="button" class="btn btn-outline-primary">
-                                    <i class="fas fa-folder-open me-2"></i>Browse Files
-                                </button>
-                            </div>
-                            <input type="file" class="d-none" id="file" name="file" required>
+                <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="class" class="form-label fw-semibold">Class</label>
+                            <select name="class" id="class" class="form-select" required>
+                                <option value="">Select Class</option>
+                                <option value="9">Class 9</option>
+                                <option value="10">Class 10</option>
+                                <option value="11">Class 11</option>
+                                <option value="12">Class 12</option>
+                            </select>
                         </div>
-                        <div class="form-text">All file types and sizes are supported</div>
-                    </div>
-
-                    <!-- File Description -->
-                    <div class="mb-3">
-                        <label for="description" class="form-label">Description (Optional)</label>
-                        <textarea class="form-control" id="description" name="description" rows="3" 
-                                  placeholder="Add a description for this file (e.g., 'This is a 2-mark question set from Tamil & Technology - useful for CAT 1')"></textarea>
-                        <div class="form-text">Help other students understand what this file contains</div>
-                    </div>
-
-                    <!-- Optional Filename -->
-                    <div class="mb-3">
-                        <label for="filename" class="form-label">Custom Filename (Optional)</label>
-                        <input type="text" class="form-control" id="filename" name="filename" 
-                               placeholder="Leave blank to use original filename">
-                    </div>
-
-                    <!-- Submit Button -->
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary btn-lg" id="uploadBtn">
-                            <span class="upload-text">
+                        <div class="col-md-6">
+                            <label for="subject" class="form-label fw-semibold">Subject</label>
+                            <select name="subject" id="subject" class="form-select" required>
+                                <option value="">Select Subject</option>
+                                {% for subject in subjects %}
+                                <option value="{{ subject.id }}" data-class="{{ subject.class_level }}">{{ subject.name }} (Class {{ subject.class_level }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="exam_type" class="form-label fw-semibold">Exam Type</label>
+                            <select name="exam_type" id="exam_type" class="form-select" required>
+                                <option value="">Select Exam Type</option>
+                                {% for type in exam_types %}
+                                <option value="{{ type }}">{{ type }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="year" class="form-label fw-semibold">Year</label>
+                            <input type="text" name="year" id="year" class="form-control" placeholder="e.g. 2024" required>
+                        </div>
+                        <div class="col-12">
+                            <label for="file" class="form-label fw-semibold">File Upload (PDF only)</label>
+                            <input type="file" name="file" id="file" class="form-control" accept=".pdf" required>
+                        </div>
+                        <div class="col-12 text-muted small">
+                            Only PDF files are supported.
+                        </div>
+                        <div class="col-12">
+                            <label for="description" class="form-label fw-semibold">Description (Optional)</label>
+                            <textarea name="description" id="description" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="col-12 mt-4">
+                            <button type="submit" class="btn btn-primary w-100 py-2">
                                 <i class="fas fa-upload me-2"></i>Upload File
-                            </span>
-                            <span class="upload-spinner d-none">
-                                <i class="fas fa-spinner fa-spin me-2"></i>Uploading...
-                            </span>
-                        </button>
+                            </button>
+                        </div>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
 <script>
-// Global file storage for form validation
-window.selectedFile = null;
-
-// Department data mapping
-const departmentData = {
-    UG: ["CSE", "MECH", "EEE", "ECE", "IT", "CHEM", "CIVIL"],
-    PG: ["M.Tech CSE (5-Year)", "M.E Applied Electronics", "M.E Structural", "M.E PED"],
-    MBA: ["General MBA"]
-};
-
-// Semester data mapping
-const semesterData = {
-    UG: ["1", "2", "3", "4", "5", "6", "7", "8"],
-    PG: ["1", "2", "3", "4"],
-    MBA: ["1", "2", "3", "4"]
-};
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Auto-fill form based on URL parameters
-    autoFillFromURL();
+document.getElementById('class').addEventListener('change', function() {
+    const classLevel = this.value;
+    const subjectSelect = document.getElementById('subject');
+    const options = subjectSelect.querySelectorAll('option');
     
-    // Handle course type selection
-    const courseTypeSelect = document.getElementById('course_type');
-    if (courseTypeSelect) {
-        courseTypeSelect.addEventListener('change', function() {
-            const courseType = this.value;
-            const departmentSelect = document.getElementById('department');
-            const semesterSelect = document.getElementById('semester');
-            
-            console.log('Course type changed to:', courseType);
-            
-            // Clear existing options
-            if (departmentSelect) {
-                departmentSelect.innerHTML = '<option value="">Select Department</option>';
-            }
-            if (semesterSelect) {
-                semesterSelect.innerHTML = '<option value="">Select Semester</option>';
-            }
-            
-            // Populate departments based on course type
-            if (courseType && departmentData[courseType]) {
-                const departments = departmentData[courseType];
-                console.log('Populating departments:', departments);
-                
-                departments.forEach(dept => {
-                    const option = document.createElement('option');
-                    option.value = dept;
-                    option.textContent = dept;
-                    if (departmentSelect) {
-                        departmentSelect.appendChild(option);
-                    }
-                });
-            }
-            
-            // Populate semesters based on course type
-            if (courseType && semesterData[courseType]) {
-                const semesters = semesterData[courseType];
-                console.log('Populating semesters:', semesters);
-                
-                semesters.forEach(sem => {
-                    const option = document.createElement('option');
-                    option.value = sem;
-                    option.textContent = `Semester ${sem}`;
-                    if (semesterSelect) {
-                        semesterSelect.appendChild(option);
-                    }
-                });
-            }
-        });
-    }
-
-    // Department selection doesn't need additional logic since semesters are populated by course type
-
-    // Form validation
-    const uploadForm = document.getElementById('uploadForm');
-    if (uploadForm) {
-        uploadForm.addEventListener('submit', function(e) {
-            // Get form field values
-            const courseTypeEl = document.getElementById('course_type');
-            const departmentEl = document.getElementById('department');
-            const semesterEl = document.getElementById('semester');
-            const categoryEl = document.getElementById('category');
-            const subjectEl = document.getElementById('subject');
-            
-            const courseType = courseTypeEl ? courseTypeEl.value.trim() : '';
-            const department = departmentEl ? departmentEl.value.trim() : '';
-            const semester = semesterEl ? semesterEl.value.trim() : '';
-            const category = categoryEl ? categoryEl.value.trim() : '';
-            const subject = subjectEl ? subjectEl.value.trim() : '';
-            
-            // Get file from multiple sources
-            let file = null;
-            const fileInputEl = document.getElementById('file');
-            
-            // Check file input first
-            if (fileInputEl && fileInputEl.files && fileInputEl.files.length > 0) {
-                file = fileInputEl.files[0];
-            }
-            
-            // If no file in input, check global storage
-            if (!file && window.selectedFile) {
-                file = window.selectedFile;
-                
-                // Try to set the file back to the input element
-                if (fileInputEl) {
-                    try {
-                        const dt = new DataTransfer();
-                        dt.items.add(window.selectedFile);
-                        fileInputEl.files = dt.files;
-                        console.log('File restored to input element');
-                    } catch (error) {
-                        console.log('Could not restore file to input:', error);
-                    }
-                }
-            }
-            
-            // Debug logging to help identify the issue
-            console.log('Form validation:', {
-                courseType: courseType,
-                department: department,
-                semester: semester,
-                category: category,
-                subject: subject,
-                file: file ? file.name : 'No file selected',
-                fileInput: fileInputEl ? 'exists' : 'missing',
-                fileInputFiles: fileInputEl ? fileInputEl.files?.length : 'N/A',
-                globalFile: window.selectedFile ? window.selectedFile.name : 'No global file'
-            });
-            
-            // Check each field individually and provide specific error messages
-            let missingFields = [];
-            
-            if (!courseType) missingFields.push('Course Type');
-            if (!department) missingFields.push('Department');
-            if (!semester) missingFields.push('Semester');
-            if (!category) missingFields.push('Category');
-            if (!subject) missingFields.push('Subject Name');
-            if (!file) missingFields.push('File');
-            
-            if (missingFields.length > 0) {
-                e.preventDefault();
-                console.log('Validation failed. Missing fields:', missingFields);
-                alert('Please fill in the following fields: ' + missingFields.join(', '));
-                return false;
-            }
-            
-            // Ensure file is properly set in the form input for submission
-            if (file && fileInputEl) {
-                try {
-                    if (!fileInputEl.files || fileInputEl.files.length === 0) {
-                        console.log('Setting file from global storage to form input');
-                        const dt = new DataTransfer();
-                        dt.items.add(file);
-                        fileInputEl.files = dt.files;
-                    }
-                } catch (error) {
-                    console.log('Error setting file to input:', error);
-                }
-            }
-            
-            console.log('Form validation passed. Proceeding with upload.');
-            
-            // Show loading state
-            const submitBtn = document.getElementById('uploadBtn');
-            if (submitBtn) {
-                const uploadText = submitBtn.querySelector('.upload-text');
-                const uploadSpinner = submitBtn.querySelector('.upload-spinner');
-                
-                if (uploadText && uploadSpinner) {
-                    uploadText.classList.add('d-none');
-                    uploadSpinner.classList.remove('d-none');
-                }
-                submitBtn.disabled = true;
-                
-                // Show toast notification
-                showToast('Uploading file...', 'info');
-            }
-        });
-    }
-
-    // Initialize drag and drop
-    initializeDragAndDrop();
+    options.forEach(option => {
+        if (option.value === "") {
+            option.style.display = 'block';
+        } else if (option.getAttribute('data-class') === classLevel) {
+            option.style.display = 'block';
+        } else {
+            option.style.display = 'none';
+        }
+    });
+    subjectSelect.value = "";
 });
-
-function autoFillFromURL() {
-    // Get URL parameters
-    const urlParams = new URLSearchParams(window.location.search);
-    const courseType = urlParams.get('course_type');
-    const department = urlParams.get('department');
-    const semester = urlParams.get('semester');
-    const category = urlParams.get('category');
-    
-    console.log('URL params:', { courseType, department, semester, category });
-    
-    // Auto-fill course type
-    if (courseType) {
-        const courseTypeSelect = document.getElementById('course_type');
-        if (courseTypeSelect) {
-            // Convert to uppercase for consistency
-            const courseTypeValue = courseType.toUpperCase();
-            courseTypeSelect.value = courseTypeValue;
-            console.log('Setting course type to:', courseTypeValue);
-            
-            // Trigger change event to populate departments and semesters
-            const changeEvent = new Event('change', { bubbles: true });
-            courseTypeSelect.dispatchEvent(changeEvent);
-        }
-    }
-    
-    // Auto-fill department after dropdown population
-    if (department && courseType) {
-        setTimeout(() => {
-            const departmentSelect = document.getElementById('department');
-            if (departmentSelect && departmentData[courseType.toUpperCase()]) {
-                // Find the correct department name
-                const departments = departmentData[courseType.toUpperCase()];
-                let matchingDept = null;
-                
-                // Try exact match first
-                matchingDept = departments.find(d => d.toLowerCase() === department.toLowerCase());
-                
-                // If no exact match, try partial match
-                if (!matchingDept) {
-                    matchingDept = departments.find(d => 
-                        d.toLowerCase().includes(department.toLowerCase()) || 
-                        department.toLowerCase().includes(d.toLowerCase())
-                    );
-                }
-                
-                // Map common department abbreviations
-                if (!matchingDept) {
-                    const deptMap = {
-                        'cse': 'CSE',
-                        'mtech_cse': 'M.Tech CSE (5-Year)',
-                        'applied_electronics': 'M.E Applied Electronics',
-                        'structural': 'M.E Structural',
-                        'ped': 'M.E PED',
-                        'general_mba': 'General MBA'
-                    };
-                    matchingDept = deptMap[department.toLowerCase()] || departments.find(d => 
-                        d.toLowerCase().replace(/[^a-z]/g, '').includes(department.toLowerCase().replace(/[^a-z]/g, ''))
-                    );
-                }
-                
-                if (matchingDept) {
-                    departmentSelect.value = matchingDept;
-                    console.log('Setting department to:', matchingDept);
-                }
-            }
-        }, 300);
-    }
-    
-    // Auto-fill semester
-    if (semester) {
-        setTimeout(() => {
-            const semesterSelect = document.getElementById('semester');
-            if (semesterSelect) {
-                semesterSelect.value = semester;
-                console.log('Setting semester to:', semester);
-            }
-        }, 300);
-    }
-    
-    // Auto-fill category (convert to uppercase for consistency)
-    if (category) {
-        const categorySelect = document.getElementById('category');
-        if (categorySelect) {
-            const categoryValue = category.toUpperCase();
-            categorySelect.value = categoryValue;
-            console.log('Setting category to:', categoryValue);
-        }
-    }
-}
-
-function initializeDragAndDrop() {
-    const dropZone = document.getElementById('dropZone');
-    const fileInput = document.getElementById('file');
-
-    if (!dropZone || !fileInput) {
-        return;
-    }
-
-    // Prevent default drag behaviors
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        dropZone.addEventListener(eventName, preventDefaults, false);
-        document.body.addEventListener(eventName, preventDefaults, false);
-    });
-
-    // Highlight drop zone when item is dragged over it
-    ['dragenter', 'dragover'].forEach(eventName => {
-        dropZone.addEventListener(eventName, highlight, false);
-    });
-
-    ['dragleave', 'drop'].forEach(eventName => {
-        dropZone.addEventListener(eventName, unhighlight, false);
-    });
-
-    // Handle dropped files
-    dropZone.addEventListener('drop', handleDrop, false);
-
-    // Handle file input change
-    fileInput.addEventListener('change', handleFileSelect, false);
-
-    function preventDefaults(e) {
-        e.preventDefault();
-        e.stopPropagation();
-    }
-
-    function highlight(e) {
-        dropZone.classList.add('drag-over');
-    }
-
-    function unhighlight(e) {
-        dropZone.classList.remove('drag-over');
-    }
-
-    function handleDrop(e) {
-        const dt = e.dataTransfer;
-        const files = dt.files;
-        
-        if (files.length > 0) {
-            fileInput.files = files;
-            handleFileSelect();
-        }
-    }
-
-    function handleFileSelect() {
-        if (!fileInput.files || fileInput.files.length === 0) {
-            console.log('No files selected in handleFileSelect');
-            return;
-        }
-        
-        const file = fileInput.files[0];
-        if (file) {
-            // Store file globally for form validation
-            window.selectedFile = file;
-            console.log('File selected:', file.name, 'Size:', file.size);
-            
-            showFilePreview(file);
-            
-            // Auto-suggest filename
-            const filenameInput = document.getElementById('filename');
-            if (filenameInput && !filenameInput.value) {
-                const name = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
-                filenameInput.placeholder = `Suggestion: ${name}`;
-            }
-        }
-    }
-
-    function showFilePreview(file) {
-        // Show compact version with file info but keep the file input element
-        dropZone.innerHTML = `
-            <div class="drop-zone-compact">
-                <i class="fas fa-file-alt fa-2x text-success me-3"></i>
-                <div>
-                    <strong>${file.name}</strong>
-                    <br><small class="text-muted">${formatFileSize(file.size)}</small>
-                </div>
-                <button type="button" class="btn btn-sm btn-outline-secondary ms-auto" onclick="clearFile()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <input type="file" class="d-none" id="file" name="file" required>
-        `;
-        dropZone.classList.add('file-selected');
-        
-        // Re-attach the file to the new input element
-        const newFileInput = document.getElementById('file');
-        if (newFileInput && window.selectedFile) {
-            const dt = new DataTransfer();
-            dt.items.add(window.selectedFile);
-            newFileInput.files = dt.files;
-            
-            // Re-attach event listener
-            newFileInput.addEventListener('change', handleFileSelect, false);
-        }
-    }
-}
-
-function clearFile() {
-    const fileInput = document.getElementById('file');
-    const dropZone = document.getElementById('dropZone');
-    
-    // Clear global file reference
-    window.selectedFile = null;
-    
-    if (fileInput) fileInput.value = '';
-    if (dropZone) dropZone.classList.remove('file-selected');
-    
-    // Restore original drop zone content
-    if (dropZone) {
-        dropZone.innerHTML = `
-            <div class="drop-zone-content">
-                <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
-                <h5 class="text-primary mb-2">Drag & Drop your file here</h5>
-                <p class="text-muted mb-3">or click to browse</p>
-                <button type="button" class="btn btn-outline-primary">
-                    <i class="fas fa-folder-open me-2"></i>Browse Files
-                </button>
-            </div>
-            <input type="file" class="d-none" id="file" name="file" required>
-        `;
-        
-        // Re-initialize drag and drop for the new elements
-        initializeDragAndDrop();
-    }
-    
-    // Clear filename suggestion
-    const filenameInput = document.getElementById('filename');
-    if (filenameInput) filenameInput.placeholder = '';
-}
-
-function formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
-
-// Toast notification function
-function showToast(message, type = 'info') {
-    // Create toast container if it doesn't exist
-    let toastContainer = document.getElementById('toastContainer');
-    if (!toastContainer) {
-        toastContainer = document.createElement('div');
-        toastContainer.id = 'toastContainer';
-        toastContainer.className = 'toast-container position-fixed top-0 end-0 p-3';
-        toastContainer.style.zIndex = '9999';
-        document.body.appendChild(toastContainer);
-    }
-    
-    // Create toast element
-    const toastId = 'toast-' + Date.now();
-    const toastHtml = `
-        <div id="${toastId}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="toast-header">
-                <i class="fas fa-${getToastIcon(type)} me-2 text-${getToastColor(type)}"></i>
-                <strong class="me-auto">Upload</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-            <div class="toast-body">
-                ${message}
-            </div>
-        </div>
-    `;
-    
-    toastContainer.insertAdjacentHTML('beforeend', toastHtml);
-    
-    // Show toast
-    const toastElement = document.getElementById(toastId);
-    const toast = new bootstrap.Toast(toastElement);
-    toast.show();
-    
-    // Remove toast element after it's hidden
-    toastElement.addEventListener('hidden.bs.toast', function() {
-        toastElement.remove();
-    });
-}
-
-function getToastIcon(type) {
-    const icons = {
-        'success': 'check-circle',
-        'error': 'exclamation-triangle',
-        'warning': 'exclamation-triangle',
-        'info': 'info-circle'
-    };
-    return icons[type] || 'info-circle';
-}
-
-function getToastColor(type) {
-    const colors = {
-        'success': 'success',
-        'error': 'danger',
-        'warning': 'warning',
-        'info': 'primary'
-    };
-    return colors[type] || 'primary';
-}
 </script>
-
-<style>
-.drop-zone {
-    border: 2px dashed #007bff;
-    border-radius: 10px;
-    padding: 3rem 2rem;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    background-color: #f8f9fa;
-    position: relative;
-}
-
-.drop-zone:hover {
-    border-color: #0056b3;
-    background-color: #e3f2fd;
-}
-
-.drop-zone.drag-over {
-    border-color: #28a745;
-    background-color: #d4edda;
-    transform: scale(1.02);
-}
-
-.drop-zone.file-selected {
-    border-color: #28a745;
-    background-color: #d4edda;
-    padding: 1rem;
-}
-
-.drop-zone-content {
-    pointer-events: none;
-}
-
-.drop-zone-compact {
-    display: flex;
-    align-items: center;
-    text-align: left;
-    pointer-events: none;
-}
-
-.drop-zone-compact button {
-    pointer-events: auto;
-}
-
-.drop-zone .btn {
-    pointer-events: auto;
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-}
-
-.drop-zone.drag-over {
-    animation: pulse 1s infinite;
-}
-</style>
 {% endblock %}

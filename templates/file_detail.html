@@ -83,10 +83,13 @@
                         <dd class="col-sm-7 text-muted">{{ file.subject_name or 'N/A' }}</dd>
                         
                         <dt class="col-sm-5">Class:</dt>
-                        <dd class="col-sm-7 text-muted">{{ file.class_level }}</dd>
+                        <dd class="col-sm-7 text-muted">Class {{ file.class_level }}</dd>
                         
-                        <dt class="col-sm-5">Category:</dt>
-                        <dd class="col-sm-7 text-muted">{{ file.category }}</dd>
+                        <dt class="col-sm-5">Exam Type:</dt>
+                        <dd class="col-sm-7 text-muted">{{ file.exam_type }}</dd>
+
+                        <dt class="col-sm-5">Year:</dt>
+                        <dd class="col-sm-7 text-muted">{{ file.year }}</dd>
                         
                         <dt class="col-sm-5">File Size:</dt>
                         <dd class="col-sm-7 text-muted">{{ file.size or 'Unknown' }}</dd>
