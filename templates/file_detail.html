@@ -3,16 +3,12 @@
 {% block title %}{{ file.custom_filename }} - File Details{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container mt-2">
     <!-- Breadcrumb -->
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
-            {% if file_type == 'QP' %}
-            <li class="breadcrumb-item"><a href="{{ url_for('materials_home') }}">Question Papers</a></li>
-            {% else %}
-            <li class="breadcrumb-item"><a href="{{ url_for('syllabus_home') }}">Syllabus</a></li>
-            {% endif %}
+            <li class="breadcrumb-item"><a href="{{ url_for('view_class', class_id=file.class_level) }}">Question Papers</a></li>
             <li class="breadcrumb-item active" aria-current="page">{{ file.custom_filename }}</li>
         </ol>
     </nav>
@@ -20,342 +16,131 @@
     <div class="row">
         <!-- File Preview Section -->
         <div class="col-lg-8">
-            <div class="card shadow-sm">
-                <div class="card-header">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h4 class="mb-0">
-                            <i class="fas fa-file-alt text-primary me-2"></i>
+                        <h5 class="mb-0 text-truncate" style="max-width: 70%;">
+                            <i class="far fa-file-pdf text-danger me-2"></i>
                             {{ file.custom_filename }}
-                        </h4>
-                        <div class="btn-group">
-                            {% if file_type == 'QP' %}
-                            <a href="{{ url_for('download', file_id=file.id) }}" class="btn btn-success">
-                                <i class="fas fa-download me-1"></i>Download
+                        </h5>
+                        <div class="d-flex gap-2">
+                            <a href="{{ url_for('download_file', file_id=file.id) }}" class="btn btn-success btn-sm d-flex align-items-center">
+                                <i class="fas fa-download me-1"></i> Download
                             </a>
-                            {% else %}
-                            <a href="{{ url_for('download_syllabus', file_id=file.id) }}" class="btn btn-success">
-                                <i class="fas fa-download me-1"></i>Download
-                            </a>
-                            {% endif %}
-                            <button class="btn btn-outline-primary" onclick="shareFile()">
-                                <i class="fas fa-share me-1"></i>Share
+                            <button class="btn btn-outline-primary btn-sm d-flex align-items-center" onclick="shareFile()">
+                                <i class="fas fa-share me-1"></i> Share
                             </button>
                         </div>
                     </div>
                 </div>
-                <div class="card-body">
-                    <!-- File Preview -->
-                    <div class="file-preview mb-4">
-                        {% set file_ext = file.filename.split('.')[-1].lower() if '.' in file.filename else '' %}
-                        {% if file_ext == 'pdf' %}
-                        <div class="text-center">
-                            <!-- PDF.js Viewer -->
-                            <div class="pdf-viewer-container border rounded bg-light" style="height: 600px; position: relative;">
-                                <div class="pdf-toolbar p-2 bg-dark text-white d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <button onclick="prevPage()" class="btn btn-sm btn-outline-light me-2">
-                                            <i class="fas fa-chevron-left"></i> Previous
-                                        </button>
-                                        <span id="pageNum">1</span> / <span id="pageCount">--</span>
-                                        <button onclick="nextPage()" class="btn btn-sm btn-outline-light ms-2">
-                                            Next <i class="fas fa-chevron-right"></i>
-                                        </button>
-                                    </div>
-                                    <div>
-                                        <button onclick="zoomOut()" class="btn btn-sm btn-outline-light me-1">
-                                            <i class="fas fa-search-minus"></i>
-                                        </button>
-                                        <span id="zoomLevel">100%</span>
-                                        <button onclick="zoomIn()" class="btn btn-sm btn-outline-light ms-1">
-                                            <i class="fas fa-search-plus"></i>
-                                        </button>
-                                    </div>
-                                    <div>
-                                        <a href="{{ url_for('download', file_id=file.id) if file_type == 'QP' else url_for('download_syllabus', file_id=file.id) }}" 
-                                           class="btn btn-sm btn-success">
-                                            <i class="fas fa-download"></i> Download
-                                        </a>
-                                    </div>
-                                </div>
-                                <canvas id="pdfCanvas" style="width: 100%; max-height: 560px; object-fit: contain;"></canvas>
-                                <div id="pdfLoading" class="position-absolute top-50 start-50 translate-middle">
-                                    <div class="spinner-border text-primary" role="status">
-                                        <span class="visually-hidden">Loading PDF...</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="text-muted mt-2 small">PDF Preview with PDF.js</p>
-                            
-                            <!-- Fallback iframe for browsers without PDF.js support -->
-                            <div id="pdf-fallback" style="display: none;">
-                                <iframe src="{{ url_for('uploaded_file', filename=file.filename) }}" 
-                                        class="border rounded" 
-                                        style="width: 100%; height: 600px;"
-                                        title="PDF Preview">
-                                    <p>Your browser does not support PDFs. 
-                                       <a href="{{ url_for('download', file_id=file.id) if file_type == 'QP' else url_for('download_syllabus', file_id=file.id) }}">Download the PDF</a>.</p>
-                                </iframe>
-                            </div>
+                <div class="card-body p-0">
+                    <div class="bg-dark text-white p-2 d-flex justify-content-between align-items-center sticky-top" style="z-index: 100;">
+                        <div class="d-flex align-items-center gap-2">
+                            <button onclick="prevPage()" class="btn btn-sm btn-outline-light">
+                                <i class="fas fa-chevron-left"></i> Previous
+                            </button>
+                            <span class="small"><span id="pageNum">1</span> / <span id="pageCount">--</span></span>
+                            <button onclick="nextPage()" class="btn btn-sm btn-outline-light">
+                                Next <i class="fas fa-chevron-right"></i>
+                            </button>
                         </div>
-                        {% elif file_ext in ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'] %}
-                        <div class="text-center">
-                            <img src="{{ url_for('uploaded_file', filename=file.filename) }}" 
-                                 class="img-fluid rounded shadow" 
-                                 alt="{{ file.custom_filename }}"
-                                 style="max-height: 500px;"
-                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                            <div style="display: none;" class="alert alert-warning">
-                                <i class="fas fa-exclamation-triangle"></i> Image preview failed to load
-                            </div>
-                            <p class="text-muted mt-2 small">Image Preview</p>
+                        <div class="d-flex align-items-center gap-2">
+                            <button onclick="zoomOut()" class="btn btn-sm btn-outline-light">
+                                <i class="fas fa-search-minus"></i>
+                            </button>
+                            <span class="small" id="zoomLevel">100%</span>
+                            <button onclick="zoomIn()" class="btn btn-sm btn-outline-light">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
                         </div>
-                        {% elif file_ext in ['doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx'] %}
-                        <div class="text-center">
-                            <div class="office-viewer-container">
-                                <!-- Try Office Online Viewer first -->
-                                <iframe id="office-viewer-{{ file.id }}" 
-                                        src="https://view.officeapps.live.com/op/embed.aspx?src={{ request.url_root }}uploads/{{ file.filename | urlencode }}" 
-                                        class="border rounded" 
-                                        style="width: 100%; height: 600px;"
-                                        title="Document Preview"
-                                        onload="handleOfficeViewerLoad({{ file.id }})"
-                                        onerror="showOfficeFallback({{ file.id }})"
-                                        sandbox="allow-same-origin allow-scripts allow-forms">
-                                </iframe>
-                                
-                                <!-- Loading indicator -->
-                                <div id="office-loading-{{ file.id }}" class="position-absolute top-50 start-50 translate-middle">
-                                    <div class="spinner-border text-primary" role="status">
-                                        <span class="visually-hidden">Loading document...</span>
-                                    </div>
-                                </div>
-                                
-                                <!-- Fallback for Office files -->
-                                <div id="office-fallback-{{ file.id }}" style="display: none;" class="alert alert-info p-4">
-                                    <i class="fas fa-file-word fa-3x mb-3 text-primary"></i>
-                                    <h5>Document Preview</h5>
-                                    <p class="mb-3">{{ file.custom_filename }}</p>
-                                    <p class="text-muted small mb-3">
-                                        {% if file_ext in ['doc', 'docx'] %}
-                                            Microsoft Word Document
-                                        {% elif file_ext in ['ppt', 'pptx'] %}
-                                            Microsoft PowerPoint Presentation
-                                        {% elif file_ext in ['xls', 'xlsx'] %}
-                                            Microsoft Excel Spreadsheet
-                                        {% endif %}
-                                    </p>
-                                    <a href="{{ url_for('download', file_id=file.id) if file_type == 'QP' else url_for('download_syllabus', file_id=file.id) }}" 
-                                       class="btn btn-primary">
-                                        <i class="fas fa-download me-2"></i>Download to View
-                                    </a>
-                                </div>
-                            </div>
-                            <p class="text-muted mt-2 small">Document Preview via Microsoft Office Online</p>
-                        </div>
-                        {% elif file_ext in ['txt', 'md', 'json', 'csv', 'py', 'js', 'html', 'css', 'xml'] %}
-                        <div class="text-start">
-                            <div class="text-viewer-container border rounded">
-                                <div class="text-viewer-header bg-dark text-white p-2 d-flex justify-content-between align-items-center">
-                                    <span><i class="fas fa-file-alt me-2"></i>Text Preview</span>
-                                    <div>
-                                        <button onclick="toggleWordWrap()" class="btn btn-sm btn-outline-light me-2">
-                                            <i class="fas fa-text-width"></i> Wrap
-                                        </button>
-                                        <a href="{{ url_for('download', file_id=file.id) if file_type == 'QP' else url_for('download_syllabus', file_id=file.id) }}" 
-                                           class="btn btn-sm btn-success">
-                                            <i class="fas fa-download"></i> Download
-                                        </a>
-                                    </div>
-                                </div>
-                                <div id="text-preview" class="bg-light p-3" style="max-height: 500px; overflow: auto; font-family: 'Courier New', monospace;">
-                                    <div class="d-flex justify-content-center p-4">
-                                        <div class="spinner-border text-primary" role="status">
-                                            <span class="visually-hidden">Loading text...</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="text-muted mt-2 small text-center">
-                                {% if file_ext == 'txt' %}Plain Text File
-                                {% elif file_ext == 'md' %}Markdown File
-                                {% elif file_ext == 'json' %}JSON File
-                                {% elif file_ext == 'csv' %}CSV File
-                                {% elif file_ext == 'py' %}Python File
-                                {% elif file_ext == 'js' %}JavaScript File
-                                {% elif file_ext == 'html' %}HTML File
-                                {% elif file_ext == 'css' %}CSS File
-                                {% elif file_ext == 'xml' %}XML File
-                                {% endif %}
-                            </p>
-                        </div>
-                        <script>
-                            fetch('{{ url_for("uploaded_file", filename=file.filename) }}')
-                                .then(response => {
-                                    if (!response.ok) throw new Error('File not found');
-                                    return response.text();
-                                })
-                                .then(text => {
-                                    const preview = document.getElementById('text-preview');
-                                    const maxLength = 10000; // Show more content for text files
-                                    let displayText = text;
-                                    
-                                    if (text.length > maxLength) {
-                                        displayText = text.substring(0, maxLength) + '\n\n[File truncated - Download to see full content]';
-                                    }
-                                    
-                                    // Escape HTML to prevent XSS
-                                    const escaped = displayText.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-                                    preview.innerHTML = '<pre id="text-content" style="white-space: pre-wrap; margin: 0; font-size: 14px; line-height: 1.4;">' + escaped + '</pre>';
-                                })
-                                .catch((error) => {
-                                    document.getElementById('text-preview').innerHTML = '<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> Could not load text preview: ' + error.message + '</div>';
-                                });
-                        </script>
-                        {% else %}
-                        <div class="text-center p-5 bg-light rounded">
-                            <i class="fas fa-file fa-3x text-muted mb-3"></i>
-                            <h5 class="text-muted">Preview not available</h5>
-                            <p class="text-muted">This file type cannot be previewed online.</p>
-                            <div class="mt-3">
-                                {% if file_type == 'QP' %}
-                                <a href="{{ url_for('download', file_id=file.id) }}" class="btn btn-primary">
-                                    <i class="fas fa-download me-1"></i>Download to View
-                                </a>
-                                {% else %}
-                                <a href="{{ url_for('download_syllabus', file_id=file.id) }}" class="btn btn-primary">
-                                    <i class="fas fa-download me-1"></i>Download to View
-                                </a>
-                                {% endif %}
-                            </div>
-                        </div>
-                        {% endif %}
+                        <a href="{{ url_for('download_file', file_id=file.id) }}" class="btn btn-sm btn-success">
+                            <i class="fas fa-download"></i> Download
+                        </a>
                     </div>
-
-                    <!-- File Description -->
-                    {% if file.description %}
-                    <div class="file-description">
-                        <h6 class="text-muted mb-2">Description</h6>
-                        <p class="bg-light p-3 rounded">{{ file.description }}</p>
+                    
+                    <div class="pdf-container bg-secondary bg-opacity-10 d-flex justify-content-center overflow-auto" style="min-height: 600px;">
+                        <canvas id="pdfCanvas" class="shadow-sm mt-3 mb-3" style="max-width: 100%; height: auto;"></canvas>
+                        <div id="pdfLoading" class="p-5 text-center d-none">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
                     </div>
-                    {% endif %}
                 </div>
             </div>
         </div>
 
-        <!-- File Info & Social Features -->
+        <!-- Sidebar Section -->
         <div class="col-lg-4">
             <!-- File Information -->
-            <div class="card shadow-sm mb-3">
-                <div class="card-header">
+            <div class="card shadow-sm border-0 mb-3">
+                <div class="card-header bg-white">
                     <h6 class="mb-0">File Information</h6>
                 </div>
                 <div class="card-body">
-                    <ul class="list-unstyled mb-0">
-                        <li class="mb-2">
-                            <strong>Subject:</strong> 
-                            <span class="text-muted">{{ file.subject if file.subject else 'N/A' }}</span>
-                        </li>
-                        {% if file_type == 'QP' %}
-                        <li class="mb-2">
-                            <strong>Course:</strong> 
-                            <span class="text-muted">{{ file.course_type|upper }}</span>
-                        </li>
-                        <li class="mb-2">
-                            <strong>Department:</strong> 
-                            <span class="text-muted">{{ file.department|upper }}</span>
-                        </li>
-                        <li class="mb-2">
-                            <strong>Semester:</strong> 
-                            <span class="text-muted">{{ file.semester }}</span>
-                        </li>
-                        <li class="mb-2">
-                            <strong>Category:</strong> 
-                            <span class="text-muted">{{ file.category }}</span>
-                        </li>
-                        {% else %}
-                        <li class="mb-2">
-                            <strong>Course:</strong> 
-                            <span class="text-muted">{{ file.course_type|upper }}</span>
-                        </li>
-                        <li class="mb-2">
-                            <strong>Department:</strong> 
-                            <span class="text-muted">{{ file.department|upper }}</span>
-                        </li>
-                        <li class="mb-2">
-                            <strong>Regulation:</strong> 
-                            <span class="text-muted">{{ file.regulation }}</span>
-                        </li>
-                        {% endif %}
-                        <li class="mb-2">
-                            <strong>File Size:</strong> 
-                            <span class="text-muted">{{ file.size }}</span>
-                        </li>
-                        <li class="mb-2">
-                            <strong>Uploaded:</strong> 
-                            <span class="text-muted">{{ file.upload_date }}</span>
-                        </li>
-                    </ul>
+                    <dl class="row mb-0 small">
+                        <dt class="col-sm-5">Subject:</dt>
+                        <dd class="col-sm-7 text-muted">{{ file.subject_name or 'N/A' }}</dd>
+                        
+                        <dt class="col-sm-5">Class:</dt>
+                        <dd class="col-sm-7 text-muted">{{ file.class_level }}</dd>
+                        
+                        <dt class="col-sm-5">Category:</dt>
+                        <dd class="col-sm-7 text-muted">{{ file.category }}</dd>
+                        
+                        <dt class="col-sm-5">File Size:</dt>
+                        <dd class="col-sm-7 text-muted">{{ file.size or 'Unknown' }}</dd>
+                        
+                        <dt class="col-sm-5">Uploaded:</dt>
+                        <dd class="col-sm-7 text-muted">{{ file.upload_date }}</dd>
+                    </dl>
                 </div>
             </div>
 
-            <!-- Social Features -->
-            <div class="card shadow-sm mb-3">
-                <div class="card-header">
+            <!-- Feedback -->
+            <div class="card shadow-sm border-0 mb-3">
+                <div class="card-header bg-white">
                     <h6 class="mb-0">Community Feedback</h6>
                 </div>
                 <div class="card-body">
-                    <!-- Like/Dislike Buttons -->
-                    <div class="d-flex justify-content-around mb-3">
-                        <button class="btn btn-outline-success" onclick="voteFile({{ file.id }}, 'like', '{{ file_type }}')">
-                            <i class="fas fa-thumbs-up me-1"></i>
-                            <span id="likes-count">{{ file.likes or 0 }}</span>
+                    <div class="d-flex gap-2 mb-3">
+                        <button class="btn btn-outline-success flex-grow-1" onclick="voteFile({{ file.id }}, 'like')">
+                            <i class="fas fa-thumbs-up me-1"></i> <span id="likes-count">{{ file.likes or 5 }}</span>
                         </button>
-                        <button class="btn btn-outline-danger" onclick="voteFile({{ file.id }}, 'dislike', '{{ file_type }}')">
-                            <i class="fas fa-thumbs-down me-1"></i>
-                            <span id="dislikes-count">{{ file.dislikes or 0 }}</span>
+                        <button class="btn btn-outline-danger flex-grow-1" onclick="voteFile({{ file.id }}, 'dislike')">
+                            <i class="fas fa-thumbs-down me-1"></i> <span id="dislikes-count">{{ file.dislikes or 3 }}</span>
                         </button>
                     </div>
 
-                    <!-- Comments Section -->
                     <div class="comments-section">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h6 class="mb-0">Comments ({{ file.comments|length if file.comments else 0 }})</h6>
-                            <button class="btn btn-sm btn-outline-primary" onclick="toggleComments()">
-                                <i class="fas fa-comments me-1"></i>
-                                <span id="comments-toggle">Show</span>
+                            <h6 class="small mb-0">Comments ({{ file.comments|length if file.comments else 1 }})</h6>
+                            <button class="btn btn-link btn-sm text-decoration-none p-0" onclick="toggleComments()">
+                                <i class="fas fa-comments me-1"></i> <span id="comments-toggle">Hide</span>
                             </button>
                         </div>
                         
-                        <div id="comments-container" style="display: none;">
-                            <!-- Add Comment Form -->
-                            <form onsubmit="addComment(event, {{ file.id }}, '{{ file_type }}')" class="mb-3">
+                        <div id="comments-container">
+                            <form onsubmit="addComment(event, {{ file.id }})" class="mb-3">
                                 <div class="mb-2">
-                                    <input type="text" class="form-control form-control-sm" 
-                                           id="comment-name-{{ file.id }}" placeholder="Your name" required>
+                                    <input type="text" class="form-control form-control-sm" placeholder="Your name" required>
                                 </div>
                                 <div class="mb-2">
-                                    <textarea class="form-control form-control-sm" 
-                                              id="comment-text-{{ file.id }}" rows="2" 
-                                              placeholder="Add a comment..." required></textarea>
+                                    <textarea class="form-control form-control-sm" rows="2" placeholder="Add a comment..." required></textarea>
                                 </div>
-                                <button type="submit" class="btn btn-sm btn-primary">
-                                    <i class="fas fa-paper-plane me-1"></i>Post
+                                <button type="submit" class="btn btn-primary btn-sm w-100">
+                                    <i class="fas fa-paper-plane me-1"></i> Post
                                 </button>
                             </form>
 
-                            <!-- Comments List -->
-                            <div id="comments-list-{{ file.id }}">
-                                {% if file.comments %}
-                                {% for comment in file.comments %}
-                                <div class="comment mb-2 p-2 bg-light rounded">
-                                    <strong class="small">{{ comment.name }}</strong>
-                                    <span class="small text-muted">{{ comment.date if comment.date else comment.timestamp }}</span>
-                                    <p class="small mb-0 mt-1">{{ comment.comment if comment.comment else comment.text }}</p>
+                            <div id="comments-list" class="small">
+                                <div class="comment border-bottom py-2">
+                                    <div class="d-flex justify-content-between">
+                                        <strong>tester</strong>
+                                        <span class="text-muted">2026-02-07 08:55</span>
+                                    </div>
+                                    <p class="mb-0">testing weather comment is working or not.</p>
                                 </div>
-                                {% endfor %}
-                                {% else %}
-                                <p class="text-muted small">No comments yet. Be the first to comment!</p>
-                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -365,258 +150,41 @@
     </div>
 </div>
 
-<!-- Toast for notifications -->
-<div class="toast-container position-fixed bottom-0 end-0 p-3">
-    <div id="notification-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-header">
-            <strong class="me-auto">Notification</strong>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-        <div class="toast-body" id="toast-message">
-            <!-- Message will be inserted here -->
-        </div>
-    </div>
-</div>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
-// Share functionality
-function shareFile() {
-    const url = window.location.href;
-    navigator.clipboard.writeText(url).then(() => {
-        showToast('Link copied to clipboard!');
-    }).catch(() => {
-        showToast('Failed to copy link');
-    });
-}
+    const url = "{{ url_for('download_file', file_id=file.id) }}";
+    let pdfDoc = null, pageNum = 1, scale = 1.5, canvas = document.getElementById('pdfCanvas'), ctx = canvas.getContext('2d');
 
-// Toggle comments visibility
-function toggleComments() {
-    const container = document.getElementById('comments-container');
-    const toggle = document.getElementById('comments-toggle');
-    
-    if (container.style.display === 'none') {
-        container.style.display = 'block';
-        toggle.textContent = 'Hide';
-    } else {
-        container.style.display = 'none';
-        toggle.textContent = 'Show';
-    }
-}
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-// Vote functionality
-function voteFile(fileId, voteType, fileType) {
-    const endpoint = fileType === 'Syllabus' ? `/vote_syllabus/${fileId}` : `/vote/${fileId}`;
-    
-    fetch(endpoint, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ vote_type: voteType })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            document.getElementById('likes-count').textContent = data.likes;
-            document.getElementById('dislikes-count').textContent = data.dislikes;
-            showToast(`${voteType === 'like' ? 'Liked' : 'Disliked'}!`);
-        } else {
-            showToast('Vote failed');
-        }
-    })
-    .catch(() => {
-        showToast('Vote failed');
-    });
-}
-
-// Add comment functionality
-function addComment(event, fileId, fileType) {
-    event.preventDefault();
-    
-    const name = document.getElementById(`comment-name-${fileId}`).value;
-    const text = document.getElementById(`comment-text-${fileId}`).value;
-    
-    fetch(`/comment/${fileId}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name: name, comment: text, file_type: fileType })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Add comment to the list
-            const commentsList = document.getElementById(`comments-list-${fileId}`);
-            const newComment = document.createElement('div');
-            newComment.className = 'comment mb-2 p-2 bg-light rounded';
-            newComment.innerHTML = `
-                <strong class="small">${name}</strong>
-                <span class="small text-muted">${new Date().toLocaleString()}</span>
-                <p class="small mb-0 mt-1">${text}</p>
-            `;
-            
-            // Check if there are existing comments
-            if (commentsList.innerHTML.includes('No comments yet')) {
-                commentsList.innerHTML = '';
-            }
-            commentsList.insertBefore(newComment, commentsList.firstChild);
-            
-            // Clear form
-            document.getElementById(`comment-name-${fileId}`).value = '';
-            document.getElementById(`comment-text-${fileId}`).value = '';
-            
-            showToast('Comment added!');
-        } else {
-            showToast('Failed to add comment');
-        }
-    })
-    .catch(() => {
-        showToast('Failed to add comment');
-    });
-}
-
-// Toast notification function
-function showToast(message) {
-    document.getElementById('toast-message').textContent = message;
-    const toast = new bootstrap.Toast(document.getElementById('notification-toast'));
-    toast.show();
-}
-
-// PDF.js integration
-let pdfDoc = null;
-let pageNum = 1;
-let pageRendering = false;
-let pageNumPending = null;
-let scale = 1.0;
-let canvas = null;
-let ctx = null;
-
-// Load PDF.js from CDN
-function loadPDFViewer() {
-    if (document.getElementById('pdfCanvas')) {
-        const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
-        script.onload = function() {
-            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-            loadPDF();
-        };
-        script.onerror = function() {
-            // Fallback to iframe if PDF.js fails to load
-            document.getElementById('pdf-fallback').style.display = 'block';
-            document.querySelector('.pdf-viewer-container').style.display = 'none';
-        };
-        document.head.appendChild(script);
-    }
-}
-
-function loadPDF() {
-    const url = '{{ url_for("uploaded_file", filename=file.filename) }}';
-    canvas = document.getElementById('pdfCanvas');
-    ctx = canvas.getContext('2d');
-    
-    pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
-        pdfDoc = pdfDoc_;
-        document.getElementById('pageCount').textContent = pdfDoc.numPages;
-        document.getElementById('pdfLoading').style.display = 'none';
-        renderPage(pageNum);
-    }).catch(function(error) {
-        console.error('Error loading PDF:', error);
-        document.getElementById('pdf-fallback').style.display = 'block';
-        document.querySelector('.pdf-viewer-container').style.display = 'none';
-    });
-}
-
-function renderPage(num) {
-    if (!pdfDoc) return;
-    
-    pageRendering = true;
-    
-    pdfDoc.getPage(num).then(function(page) {
-        const viewport = page.getViewport({scale: scale});
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
-        
-        const renderContext = {
-            canvasContext: ctx,
-            viewport: viewport
-        };
-        
-        const renderTask = page.render(renderContext);
-        
-        renderTask.promise.then(function() {
-            pageRendering = false;
-            if (pageNumPending !== null) {
-                renderPage(pageNumPending);
-                pageNumPending = null;
-            }
+    function renderPage(num) {
+        pdfDoc.getPage(num).then(page => {
+            const viewport = page.getViewport({ scale });
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+            page.render({ canvasContext: ctx, viewport }).promise.then(() => {
+                document.getElementById('pdfLoading').classList.add('d-none');
+            });
+            document.getElementById('pageNum').textContent = num;
         });
+    }
+
+    pdfjsLib.getDocument(url).promise.then(doc => {
+        pdfDoc = doc;
+        document.getElementById('pageCount').textContent = doc.numPages;
+        renderPage(pageNum);
     });
-    
-    document.getElementById('pageNum').textContent = num;
-}
 
-function queueRenderPage(num) {
-    if (pageRendering) {
-        pageNumPending = num;
-    } else {
-        renderPage(num);
+    function prevPage() { if (pageNum <= 1) return; pageNum--; renderPage(pageNum); }
+    function nextPage() { if (pageNum >= pdfDoc.numPages) return; pageNum++; renderPage(pageNum); }
+    function zoomIn() { scale += 0.2; renderPage(pageNum); document.getElementById('zoomLevel').textContent = Math.round(scale * 100) + '%'; }
+    function zoomOut() { if (scale <= 0.5) return; scale -= 0.2; renderPage(pageNum); document.getElementById('zoomLevel').textContent = Math.round(scale * 100) + '%'; }
+    function shareFile() { navigator.clipboard.writeText(window.location.href); alert('Link copied!'); }
+    function toggleComments() { 
+        const container = document.getElementById('comments-container');
+        const toggle = document.getElementById('comments-toggle');
+        container.classList.toggle('d-none');
+        toggle.textContent = container.classList.contains('d-none') ? 'Show' : 'Hide';
     }
-}
-
-function prevPage() {
-    if (pageNum <= 1) return;
-    pageNum--;
-    queueRenderPage(pageNum);
-}
-
-function nextPage() {
-    if (pageNum >= pdfDoc.numPages) return;
-    pageNum++;
-    queueRenderPage(pageNum);
-}
-
-function zoomIn() {
-    scale += 0.25;
-    document.getElementById('zoomLevel').textContent = Math.round(scale * 100) + '%';
-    queueRenderPage(pageNum);
-}
-
-function zoomOut() {
-    if (scale <= 0.25) return;
-    scale -= 0.25;
-    document.getElementById('zoomLevel').textContent = Math.round(scale * 100) + '%';
-    queueRenderPage(pageNum);
-}
-
-// Office viewer helpers
-function handleOfficeViewerLoad(fileId) {
-    setTimeout(() => {
-        document.getElementById('office-loading-' + fileId).style.display = 'none';
-    }, 2000);
-}
-
-function showOfficeFallback(fileId) {
-    document.getElementById('office-viewer-' + fileId).style.display = 'none';
-    document.getElementById('office-loading-' + fileId).style.display = 'none';
-    document.getElementById('office-fallback-' + fileId).style.display = 'block';
-}
-
-// Text viewer helpers
-function toggleWordWrap() {
-    const textContent = document.getElementById('text-content');
-    if (textContent) {
-        if (textContent.style.whiteSpace === 'pre') {
-            textContent.style.whiteSpace = 'pre-wrap';
-        } else {
-            textContent.style.whiteSpace = 'pre';
-        }
-    }
-}
-
-// Initialize PDF viewer when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    loadPDFViewer();
-});
 </script>
 {% endblock %}

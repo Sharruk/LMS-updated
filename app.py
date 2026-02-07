@@ -48,51 +48,68 @@ def load_data():
         if os.path.exists(DATA_FILE):
             with open(DATA_FILE, 'r') as f:
                 data = json.load(f)
-            # Migration from course_types to classes (school focus)
-            if 'classes' not in data:
-                if 'course_types' in data:
-                    data['classes'] = {
-                        "9": {"name": "Class 9", "subjects": {}},
-                        "10": {"name": "Class 10", "subjects": {}},
-                        "11": {"name": "Class 11", "subjects": {}},
-                        "12": {"name": "Class 12", "subjects": {}}
-                    }
-                else:
-                    data['classes'] = {
-                        "9": {"name": "Class 9", "subjects": {}},
-                        "10": {"name": "Class 10", "subjects": {}},
-                        "11": {"name": "Class 11", "subjects": {}},
-                        "12": {"name": "Class 12", "subjects": {}}
-                    }
-            if 'exam_types' not in data:
-                data['exam_types'] = [
-                    "Unit Test 1", "Unit Test 2", "Unit Test 3",
-                    "Quarterly Exam", "Half Yearly Exam",
-                    "Revision Test", "Model Practical",
-                    "Practical Exam", "Annual Exam"
-                ]
-            return data
         else:
-            data = {
-                "classes": {
-                    "9": {"name": "Class 9", "subjects": {}},
-                    "10": {"name": "Class 10", "subjects": {}},
-                    "11": {"name": "Class 11", "subjects": {}},
-                    "12": {"name": "Class 12", "subjects": {}}
-                },
-                "exam_types": [
-                    "Unit Test 1", "Unit Test 2", "Unit Test 3",
-                    "Quarterly Exam", "Half Yearly Exam",
-                    "Revision Test", "Model Practical",
-                    "Practical Exam", "Annual Exam"
-                ],
-                "files": []
-            }
-            save_data(data)
-            return data
+            data = {"classes": {}, "files": [], "exam_categories": []}
+
+        # Ensure standard hierarchy exists
+        if 'classes' not in data:
+            data['classes'] = {}
+        
+        # Standard subjects for Class 9 & 10
+        common_subjects = {
+            "tamil": "Tamil",
+            "english": "English",
+            "maths": "Mathematics",
+            "science": "Science",
+            "social": "Social Science"
+        }
+        
+        # Higher secondary subjects for Class 11 & 12
+        hs_subjects = {
+            "tamil": "Tamil",
+            "english": "English",
+            "maths": "Mathematics",
+            "physics": "Physics",
+            "chemistry": "Chemistry",
+            "biology": "Biology",
+            "csc": "Computer Science",
+            "capp": "Computer Applications",
+            "acc": "Accountancy",
+            "comm": "Commerce",
+            "eco": "Economics"
+        }
+
+        for cid in ["9", "10"]:
+            if cid not in data['classes']:
+                data['classes'][cid] = {"name": f"Class {cid}", "subjects": {}}
+            for sid, sname in common_subjects.items():
+                if sid not in data['classes'][cid]['subjects']:
+                    data['classes'][cid]['subjects'][sid] = sname
+
+        for cid in ["11", "12"]:
+            if cid not in data['classes']:
+                data['classes'][cid] = {"name": f"Class {cid}", "subjects": {}}
+            for sid, sname in hs_subjects.items():
+                if sid not in data['classes'][cid]['subjects']:
+                    data['classes'][cid]['subjects'][sid] = sname
+
+        if 'exam_categories' not in data or not data['exam_categories']:
+            data['exam_categories'] = [
+                {"name": "Unit Tests", "types": ["Unit Test 1", "Unit Test 2", "Unit Test 3", "Unit Test 4", "Unit Test 5"]},
+                {"name": "Midterm Tests", "types": ["Midterm Test 1", "Midterm Test 2"]},
+                {"name": "Quarterly Exam", "types": ["Quarterly Exam"]},
+                {"name": "Half Yearly Exam", "types": ["Half Yearly Exam"]},
+                {"name": "Practical Exam", "types": ["Practical Exam"]},
+                {"name": "Annual Exam", "types": ["Annual Exam", "Public Exam"]}
+            ]
+        
+        if 'files' not in data:
+            data['files'] = []
+            
+        return data
     except Exception as e:
-        app.logger.error(f"Error loading data: {e}")
-        return {"classes": {}, "files": [], "exam_types": []}
+        logging.error(f"Error loading data: {e}")
+        return {"classes": {}, "files": [], "exam_categories": []}
 
 def save_data(data):
     """Save data to JSON file"""
@@ -100,7 +117,7 @@ def save_data(data):
         with open(DATA_FILE, 'w') as f:
             json.dump(data, f, indent=2)
     except Exception as e:
-        app.logger.error(f"Error saving data: {e}")
+        logging.error(f"Error saving data: {e}")
 
 # Admin access configuration
 ADMIN_SECRET_PATH = os.environ.get("ADMIN_SECRET_PATH", "admin")
@@ -140,7 +157,7 @@ def index():
     data = load_data()
     return render_template('index.html', classes=data['classes'])
 
-@app.route('/class/<class_id>')
+@app.route('/class-<class_id>')
 def view_class(class_id):
     data = load_data()
     if class_id not in data['classes']:
@@ -148,11 +165,39 @@ def view_class(class_id):
         return redirect(url_for('index'))
     return render_template('class_view.html', class_id=class_id, class_data=data['classes'][class_id])
 
-@app.route('/subject/<class_id>/<subject_id>')
+@app.route('/class-<class_id>/<subject_id>')
 def view_subject(class_id, subject_id):
     data = load_data()
-    exam_types = data.get('exam_types', [])
-    return render_template('subject_view.html', class_id=class_id, subject_id=subject_id, exam_types=exam_types)
+    if class_id not in data['classes'] or subject_id not in data['classes'][class_id]['subjects']:
+        flash('Subject not found', 'error')
+        return redirect(url_for('view_class', class_id=class_id))
+    
+    subject_name = data['classes'][class_id]['subjects'][subject_id]
+    exam_categories = data.get('exam_categories', [])
+    return render_template('subject_view.html', 
+                         class_id=class_id, 
+                         subject_id=subject_id, 
+                         subject_name=subject_name,
+                         exam_categories=exam_categories)
+
+@app.route('/class-<class_id>/<subject_id>/<exam_type_slug>')
+def view_exam_type(class_id, subject_id, exam_type_slug):
+    data = load_data()
+    exam_display_name = exam_type_slug.replace('-', ' ').title()
+    if class_id not in data['classes'] or subject_id not in data['classes'][class_id]['subjects']:
+         return redirect(url_for('index'))
+    subject_name = data['classes'][class_id]['subjects'].get(subject_id)
+    relevant_files = [f for f in data['files'] if 
+                     str(f.get('class_level')) == str(class_id) and 
+                     (str(f.get('subject_id')) == str(subject_id) or f.get('subject_name') == subject_name) and
+                     exam_type_slug in f.get('category', '').lower().replace(' ', '-')]
+    
+    return render_template('exam_type_view.html', 
+                         class_id=class_id, 
+                         subject_id=subject_id, 
+                         subject_name=subject_name,
+                         exam_display_name=exam_display_name,
+                         files=relevant_files)
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
@@ -163,7 +208,14 @@ def upload():
         # Implementation for file upload
         pass
     data = load_data()
-    return render_template('upload.html', classes=data['classes'], exam_types=data['exam_types'])
+    # Handle both old and new data structure for template compatibility
+    exam_types = []
+    if 'exam_categories' in data:
+        for cat in data['exam_categories']:
+            exam_types.extend(cat['types'])
+    else:
+        exam_types = data.get('exam_types', [])
+    return render_template('upload.html', classes=data['classes'], exam_types=exam_types)
 
 @app.route('/search')
 def search():
