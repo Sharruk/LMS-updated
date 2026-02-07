@@ -65,47 +65,47 @@ def load_data():
         }
         
         # Higher secondary subjects for Class 11 & 12
-    hs_subjects = {
-        "tamil": "Tamil",
-        "english": "English",
-        "maths": "Mathematics",
-        "physics": "Physics",
-        "chemistry": "Chemistry",
-        "biology": "Biology",
-        "csc": "Computer Science",
-        "capp": "Computer Applications",
-        "acc": "Accountancy",
-        "comm": "Commerce",
-        "eco": "Economics"
-    }
+        hs_subjects = {
+            "tamil": "Tamil",
+            "english": "English",
+            "maths": "Mathematics",
+            "physics": "Physics",
+            "chemistry": "Chemistry",
+            "biology": "Biology",
+            "csc": "Computer Science",
+            "capp": "Computer Applications",
+            "acc": "Accountancy",
+            "comm": "Commerce",
+            "eco": "Economics"
+        }
 
-    # Theory-only subjects (for hiding practicals)
-    theory_only = ["tamil", "english", "maths", "social"]
+        # Theory-only subjects (for hiding practicals)
+        theory_only = ["tamil", "english", "maths", "social"]
 
-    for cid in ["9", "10"]:
-        if cid not in data['classes']:
-            data['classes'][cid] = {"name": f"Class {cid}", "subjects": {}}
-        for sid, sname in common_subjects.items():
-            if sid not in data['classes'][cid]['subjects']:
-                data['classes'][cid]['subjects'][sid] = {"name": sname, "is_theory_only": sid in theory_only}
+        for cid in ["9", "10"]:
+            if cid not in data['classes']:
+                data['classes'][cid] = {"name": f"Class {cid}", "subjects": {}}
+            for sid, sname in common_subjects.items():
+                if sid not in data['classes'][cid]['subjects']:
+                    data['classes'][cid]['subjects'][sid] = {"name": sname, "is_theory_only": sid in theory_only}
 
-    for cid in ["11", "12"]:
-        if cid not in data['classes']:
-            data['classes'][cid] = {"name": f"Class {cid}", "subjects": {}}
-        for sid, sname in hs_subjects.items():
-            if sid not in data['classes'][cid]['subjects']:
-                data['classes'][cid]['subjects'][sid] = {"name": sname, "is_theory_only": sid in theory_only}
+        for cid in ["11", "12"]:
+            if cid not in data['classes']:
+                data['classes'][cid] = {"name": f"Class {cid}", "subjects": {}}
+            for sid, sname in hs_subjects.items():
+                if sid not in data['classes'][cid]['subjects']:
+                    data['classes'][cid]['subjects'][sid] = {"name": sname, "is_theory_only": sid in theory_only}
 
-    if 'exam_categories' not in data or not data['exam_categories']:
-        data['exam_categories'] = [
-            {"name": "Unit Tests", "types": ["Unit Test 1", "Unit Test 2", "Unit Test 3", "Unit Test 4", "Unit Test 5"]},
-            {"name": "Midterm Tests", "types": ["Midterm Test 1", "Midterm Test 2"]},
-            {"name": "Quarterly Exam", "types": ["Quarterly Exam"]},
-            {"name": "Half Yearly Exam", "types": ["Half Yearly Exam"]},
-            {"name": "Practical Exam", "types": ["Practical Exam"]},
-            {"name": "Annual Exam", "types": ["Annual Exam", "Public Exam"]}
-        ]
-        
+        if 'exam_categories' not in data or not data['exam_categories']:
+            data['exam_categories'] = [
+                {"name": "Unit Tests", "types": ["Unit Test 1", "Unit Test 2", "Unit Test 3", "Unit Test 4", "Unit Test 5"]},
+                {"name": "Midterm Tests", "types": ["Midterm Test 1", "Midterm Test 2"]},
+                {"name": "Quarterly Exam", "types": ["Quarterly Exam"]},
+                {"name": "Half Yearly Exam", "types": ["Half Yearly Exam"]},
+                {"name": "Practical Exam", "types": ["Practical Exam"]},
+                {"name": "Annual Exam", "types": ["Annual Exam", "Public Exam"]}
+            ]
+            
         if 'files' not in data:
             data['files'] = []
             
