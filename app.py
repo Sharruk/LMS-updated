@@ -16,34 +16,44 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET")
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
-# Database configuration
-db_url = os.environ.get('DATABASE_URL')
-if db_url and db_url.startswith("postgres://"):
-    db_url = db_url.replace("postgres://", "postgresql://", 1)
+# Database configuration for Render/Replit
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = db_url or 'sqlite:///tn_board_portal.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL or 'sqlite:///tn_board_portal.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-# Initialize database
 app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
     "pool_recycle": 300,
     "pool_pre_ping": True,
 }
+
+# Initialize database
 db.init_app(app)
 
 with app.app_context():
-    import models  # noqa: F401
     db.create_all()
+    
+    # Create default admin if it doesn't exist (Change credentials via shell later)
+    admin_user = User.query.filter_by(username='admin').first()
+    if not admin_user:
+        hashed_password = generate_password_hash('admin123')
+        new_admin = User(
+            username='admin',
+            email='admin@example.com',
+            password_hash=hashed_password,
+            is_admin=True
+        )
+        db.session.add(new_admin)
+        db.session.commit()
+        logging.info("Default admin user created.")
 
 # Configuration
 UPLOAD_FOLDER = 'uploads'
 DATA_FILE = 'data.json'
-MAX_FILE_SIZE = None
 ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'csv', 'txt', 'jpg', 'png', 'jpeg', 'mp4'}
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-# Ensure directories exist
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 def load_data():
@@ -55,35 +65,18 @@ def load_data():
         else:
             data = {"classes": {}, "files": [], "exam_categories": []}
         
-        # Ensure standard hierarchy exists
-        if 'classes' not in data:
-            data['classes'] = {}
-            
         # Standard subjects for Class 9 & 10
         common_subjects = {
-            "tamil": "Tamil",
-            "english": "English",
-            "maths": "Mathematics",
-            "science": "Science",
-            "social": "Social Science"
+            "tamil": "Tamil", "english": "English", "maths": "Mathematics",
+            "science": "Science", "social": "Social Science"
         }
-        
         # Higher secondary subjects for Class 11 & 12
         hs_subjects = {
-            "tamil": "Tamil",
-            "english": "English",
-            "maths": "Mathematics",
-            "physics": "Physics",
-            "chemistry": "Chemistry",
-            "biology": "Biology",
-            "csc": "Computer Science",
-            "capp": "Computer Applications",
-            "acc": "Accountancy",
-            "comm": "Commerce",
-            "eco": "Economics"
+            "tamil": "Tamil", "english": "English", "maths": "Mathematics",
+            "physics": "Physics", "chemistry": "Chemistry", "biology": "Biology",
+            "csc": "Computer Science", "capp": "Computer Applications",
+            "acc": "Accountancy", "comm": "Commerce", "eco": "Economics"
         }
-
-        # Theory-only subjects (for hiding practicals)
         theory_only = ["tamil", "english", "maths", "social"]
 
         for cid in ["9", "10"]:
@@ -109,10 +102,6 @@ def load_data():
                 {"name": "Practical Exam", "types": ["Practical Exam"]},
                 {"name": "Annual Exam", "types": ["Annual Exam", "Public Exam"]}
             ]
-            
-        if 'files' not in data:
-            data['files'] = []
-            
         return data
     except Exception as e:
         logging.error(f"Error loading data: {e}")
@@ -126,7 +115,6 @@ def save_data(data):
     except Exception as e:
         logging.error(f"Error saving data: {e}")
 
-# Admin access configuration
 ADMIN_SECRET_PATH = os.environ.get("ADMIN_SECRET_PATH", "admin")
 
 def is_admin():
@@ -205,12 +193,7 @@ def view_subject(class_id, subject_id):
         return redirect(url_for('view_class', class_id=class_id))
     
     subject_info = data['classes'][class_id]['subjects'][subject_id]
-    if isinstance(subject_info, dict):
-        subject_name = subject_info.get('name')
-        is_theory_only = subject_info.get('is_theory_only', False)
-    else:
-        subject_name = subject_info
-        is_theory_only = False
+    subject_name = subject_info.get('name') if isinstance(subject_info, dict) else subject_info
 
     exam_categories = [
         {"name": "Unit Tests", "types": ["Unit Test 1", "Unit Test 2", "Unit Test 3", "Unit Test 4", "Unit Test 5"]},
@@ -220,17 +203,13 @@ def view_subject(class_id, subject_id):
         {"name": "Practical Exam", "types": ["Practical Exam"]},
         {"name": "Annual Exam", "types": ["Annual Exam", "Public Exam"]}
     ]
-    
-    # Priority reordering
     priority = ["Unit Tests", "Midterm Tests", "Quarterly Exam", "Half Yearly Exam", "Annual Exam", "Practical Exam"]
     exam_categories.sort(key=lambda x: priority.index(x['name']) if x['name'] in priority else 99)
 
-    # Practical exam logic
     practical_subjects = ["Science", "Physics", "Chemistry", "Biology", "Computer Science", "Computer Applications"]
     if subject_name not in practical_subjects:
         exam_categories = [c for c in exam_categories if c['name'] != "Practical Exam"]
 
-    # Calculate counts for each exam type
     files = data.get('files', [])
     for cat in exam_categories:
         cat['counts'] = {}
@@ -299,22 +278,17 @@ def upload():
 
         original_filename = secure_filename(file.filename)
         extension = os.path.splitext(original_filename)[1]
-        
         timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
         stored_filename = f"{timestamp}_{original_filename}"
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], stored_filename)
         file.save(file_path)
         
-        # Determine display filename
         final_custom_name = custom_filename if custom_filename else os.path.splitext(file.filename)[0]
         if not final_custom_name.lower().endswith(extension.lower()):
             final_custom_name += extension
             
         file_size = os.path.getsize(file_path)
-        if file_size < 1024 * 1024:
-            size_str = f"{file_size / 1024:.1f} KB"
-        else:
-            size_str = f"{file_size / (1024*1024):.1f} MB"
+        size_str = f"{file_size / 1024:.1f} KB" if file_size < 1024 * 1024 else f"{file_size / (1024*1024):.1f} MB"
         
         new_file = File(
             filename=stored_filename,
@@ -332,7 +306,6 @@ def upload():
         db.session.add(new_file)
         db.session.commit()
         
-        # Sync with data.json
         data = load_data()
         data['files'].append(new_file.to_dict())
         save_data(data)
@@ -341,11 +314,7 @@ def upload():
         return redirect(url_for('admin_dashboard'))
 
     subjects = Subject.query.all()
-    exam_types = [
-        "Unit Test 1", "Unit Test 2", "Unit Test 3", 
-        "Quarterly Exam", "Half Yearly Exam", "Revision Test", 
-        "Model Practical", "Practical Exam", "Annual Exam"
-    ]
+    exam_types = ["Unit Test 1", "Unit Test 2", "Unit Test 3", "Quarterly Exam", "Half Yearly Exam", "Revision Test", "Model Practical", "Practical Exam", "Annual Exam"]
     return render_template('upload.html', subjects=subjects, exam_types=exam_types)
 
 @app.route('/admin/manage-files')
@@ -365,12 +334,9 @@ def delete_file(file_id):
             os.remove(file_to_delete.file_path)
         db.session.delete(file_to_delete)
         db.session.commit()
-        
-        # Sync with data.json
         data = load_data()
         data['files'] = [f for f in data['files'] if f['id'] != file_id]
         save_data(data)
-        
         flash('File deleted successfully', 'success')
     except Exception as e:
         db.session.rollback()
@@ -384,15 +350,12 @@ def toggle_visibility(file_id):
     file_item = File.query.get_or_404(file_id)
     file_item.visible = not file_item.visible
     db.session.commit()
-    
-    # Sync with data.json
     data = load_data()
     for f in data['files']:
         if f['id'] == file_id:
             f['visible'] = file_item.visible
             break
     save_data(data)
-    
     return redirect(url_for('manage_files'))
 
 @app.route('/api/comment/<int:file_id>', methods=['POST'])
@@ -402,7 +365,6 @@ def add_comment(file_id):
     content = data.get('content')
     if not author or not content:
         return jsonify({'success': False, 'message': 'Missing fields'}), 400
-        
     comment = Comment(file_id=file_id, author_name=author, content=content)
     db.session.add(comment)
     db.session.commit()
@@ -443,4 +405,4 @@ def download_file(file_id):
     return send_from_directory(app.config['UPLOAD_FOLDER'], file_found['filename'])
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))

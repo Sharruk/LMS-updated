@@ -37,7 +37,7 @@ class Comment(db.Model):
     content = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
-    file = db.relationship('File', backref='comments_list')
+    file = db.relationship('File', backref=db.backref('comments_list', lazy=True))
 
     def to_dict(self):
         return {
