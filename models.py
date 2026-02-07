@@ -28,6 +28,25 @@ class Subject(db.Model):
     def __repr__(self):
         return f'<Subject {self.code}: {self.name}>'
 
+class Comment(db.Model):
+    __tablename__ = 'comments'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    file_id = db.Column(db.Integer, db.ForeignKey('files.id'), nullable=False)
+    author_name = db.Column(db.String(80), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    file = db.relationship('File', backref='comments_list')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'author_name': self.author_name,
+            'content': self.content,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
 class File(db.Model):
     __tablename__ = 'files'
     
@@ -69,7 +88,8 @@ class File(db.Model):
             'upload_date': self.upload_date.isoformat() if self.upload_date else None,
             'visible': self.visible,
             'likes': self.likes,
-            'dislikes': self.dislikes
+            'dislikes': self.dislikes,
+            'comments': [c.to_dict() for c in self.comments_list] if hasattr(self, 'comments_list') else []
         }
     
     def __repr__(self):
