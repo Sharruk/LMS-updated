@@ -1,9 +1,10 @@
-# College Materials & PYQs Portal
+# Tamil Nadu State Board – Question Papers & Answer Keys Portal
 
 ## Overview
-A comprehensive web portal for college students to access and download previous year question papers, answer keys, and study materials. Supports UG, PG, and MBA course types with hierarchical navigation: Course Type -> Department -> Semester -> Category.
+A comprehensive web portal for school students (Class 9-12) to access and download previous year question papers and answer keys. The system follows a strict hierarchy: Class -> Subject -> Exam Type.
 
 ## Recent Changes
+- 2026-02-07: Refactored from College Portal to School Portal. Updated data structures to support Class-based navigation.
 - 2026-02-07: Initial Replit setup - fixed data.json compatibility, database initialization, and deployment configuration.
 
 ## System Architecture
@@ -25,12 +26,12 @@ A comprehensive web portal for college students to access and download previous 
 - `app.py` - Flask application with all routes and business logic
 - `models.py` - SQLAlchemy models (Subject, File, User)
 - `init_db.py` - Database initialization and seeding script
-- `data.json` - JSON data store for course hierarchy and file metadata
+- `data.json` - JSON data store for class hierarchy and file metadata
 - `templates/` - Jinja2 HTML templates
 - `static/` - CSS and JavaScript files
 
 ### Database Models
-- **Subject**: Academic subjects with code, name, course_type, department, semester, category
+- **Subject**: Academic subjects with code, name, class_level, category
 - **File**: Uploaded files with metadata and subject associations
 - **User**: Admin users for content management
 

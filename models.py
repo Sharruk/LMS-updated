@@ -9,10 +9,8 @@ class Subject(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     code = db.Column(db.String(20), nullable=False, unique=True)
     name = db.Column(db.String(200), nullable=False)
-    course_type = db.Column(db.String(10), nullable=False)  # UG, PG, MBA
-    department = db.Column(db.String(100), nullable=False)
-    semester = db.Column(db.String(10), nullable=False)
-    category = db.Column(db.String(50), nullable=False)  # CAT, ESE, SAT, Practical
+    class_level = db.Column(db.String(10), nullable=False)  # 9, 10, 11, 12
+    category = db.Column(db.String(50), nullable=False)  # Theory, Practical
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -21,9 +19,7 @@ class Subject(db.Model):
             'id': self.id,
             'code': self.code,
             'name': self.name,
-            'course_type': self.course_type,
-            'department': self.department,
-            'semester': self.semester,
+            'class_level': self.class_level,
             'category': self.category,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
@@ -39,9 +35,7 @@ class File(db.Model):
     filename = db.Column(db.String(255), nullable=False)
     original_filename = db.Column(db.String(255), nullable=False)
     custom_filename = db.Column(db.String(255), nullable=False)
-    course_type = db.Column(db.String(10), nullable=False)
-    department = db.Column(db.String(100), nullable=False)
-    semester = db.Column(db.String(10), nullable=False)
+    class_level = db.Column(db.String(10), nullable=False)
     category = db.Column(db.String(50), nullable=False)
     subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id'), nullable=True)
     subject_name = db.Column(db.String(200), nullable=True)  # For backward compatibility
@@ -59,9 +53,7 @@ class File(db.Model):
             'filename': self.filename,
             'original_filename': self.original_filename,
             'custom_filename': self.custom_filename,
-            'course_type': self.course_type,
-            'department': self.department,
-            'semester': self.semester,
+            'class_level': self.class_level,
             'category': self.category,
             'subject_id': self.subject_id,
             'subject_name': self.subject_name,
