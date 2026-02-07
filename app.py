@@ -113,7 +113,7 @@ ADMIN_SECRET_PATH = os.environ.get("ADMIN_SECRET_PATH", "admin")
 def is_admin():
     return session.get('is_admin', False)
 
-@app.route(f'/{ADMIN_SECRET_PATH}', methods=['GET', 'POST'])
+@app.route('/admin', methods=['GET', 'POST'])
 def admin_login():
     if request.method == 'POST':
         username = request.form.get('username')
@@ -129,10 +129,10 @@ def admin_login():
             flash('Invalid admin credentials', 'error')
     return render_template('admin/login.html')
 
-@app.route(f'/{ADMIN_SECRET_PATH}/dashboard')
+@app.route('/admin/dashboard')
 def admin_dashboard():
     if not is_admin():
-        return redirect(url_for('index'))
+        return redirect(url_for('admin_login'))
     return render_template('admin/dashboard.html')
 
 @app.route('/admin/comments')
@@ -262,7 +262,7 @@ def upload():
         description = request.form.get('description', '')
         custom_filename = request.form.get('custom_filename', '').strip()
         
-        subject = Subject.query.get(subject_id)
+        subject = db.session.get(Subject, subject_id)
         if not subject:
             flash('Invalid subject', 'error')
             return redirect(request.url)
@@ -285,7 +285,7 @@ def upload():
             filename=stored_filename,
             original_filename=file.filename,
             custom_filename=final_custom_name,
-            class_level=class_level,
+            class_level=str(class_level),
             subject_id=subject.id,
             subject_name=subject.name,
             exam_type=exam_type,
@@ -376,25 +376,38 @@ def vote(file_id):
 @app.route("/search")
 def search():
     query = request.args.get("q", "").strip().lower()
+    class_level = request.args.get("class_level", "").strip()
+    year = request.args.get("year", "").strip()
+    subject_filter = request.args.get("subject", "").strip().lower()
+    exam_type_filter = request.args.get("exam_type", "").strip().lower()
+    
     data = load_data()
     all_files = data.get('files', [])
     
-    if not query:
-        return render_template('search.html', all_files=all_files, query="")
-
     filtered_files = []
     for f in all_files:
-        # Search by: Subject name, Class, Year, File title
+        # Keywords search
         subject_name = str(f.get('subject_name', '')).lower()
-        class_level = f"class {f.get('class_level', '')}".lower()
-        year = str(f.get('year', '')).lower()
+        class_val = str(f.get('class_level', '')).lower()
+        year_val = str(f.get('year', '')).lower()
         title = str(f.get('custom_filename', '')).lower()
+        exam_type_val = str(f.get('exam_type', '')).lower()
         
-        if (query in subject_name or 
-            query in class_level or 
-            query in year or 
-            query in title):
-            filtered_files.append(f)
+        matches_query = not query or (
+            query in subject_name or 
+            query in class_val or 
+            query in year_val or 
+            query in title
+        )
+        
+        matches_class = not class_level or class_val == class_level
+        matches_year = not year or year_val == year
+        matches_subject = not subject_filter or subject_filter in subject_name
+        matches_exam_type = not exam_type_filter or exam_type_filter in exam_type_val
+        
+        if matches_query and matches_class and matches_year and matches_subject and matches_exam_type:
+            if f.get('visible', True) or is_admin():
+                filtered_files.append(f)
             
     return render_template('search.html', all_files=filtered_files, query=query)
 

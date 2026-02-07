@@ -6,14 +6,59 @@
 <div class="row mb-4">
     <div class="col-12">
         <div class="card shadow-sm border-0" style="border-radius: 1rem; background: #f8f9fa;">
-            <div class="card-body p-4 text-center">
-                <h1 class="h3 fw-bold mb-3">Search Results</h1>
-                <p class="text-muted">Showing results for: <span class="fw-bold text-primary">"{{ query if query else 'All Files' }}"</span></p>
-                <form action="{{ url_for('search') }}" method="GET" class="mx-auto" style="max-width: 600px;">
-                    <div class="input-group input-group-lg">
-                        <input type="text" name="q" class="form-control border-0 shadow-none" placeholder="Search by subject, class, year..." value="{{ query }}">
-                        <button class="btn btn-primary px-4" type="submit">
-                            <i class="fas fa-search"></i>
+            <div class="card-body p-4">
+                <h1 class="h3 fw-bold mb-4 text-center">Search Materials</h1>
+                <form action="{{ url_for('search') }}" method="GET" class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Keywords</label>
+                        <input type="text" name="q" class="form-control" placeholder="Search by subject, file name..." value="{{ query }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Class</label>
+                        <select name="class_level" class="form-select">
+                            <option value="">All Classes</option>
+                            <option value="9" {% if request.args.get('class_level') == '9' %}selected{% endif %}>Class 9</option>
+                            <option value="10" {% if request.args.get('class_level') == '10' %}selected{% endif %}>Class 10</option>
+                            <option value="11" {% if request.args.get('class_level') == '11' %}selected{% endif %}>Class 11</option>
+                            <option value="12" {% if request.args.get('class_level') == '12' %}selected{% endif %}>Class 12</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-bold">Year</label>
+                        <select name="year" class="form-select">
+                            <option value="">All Years</option>
+                            {% for y in range(2026, 2014, -1) %}
+                            <option value="{{ y }}" {% if request.args.get('year') == y|string %}selected{% endif %}>{{ y }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Subject</label>
+                        <select name="subject" class="form-select">
+                            <option value="">All Subjects</option>
+                            <option value="maths" {% if request.args.get('subject') == 'maths' %}selected{% endif %}>Maths</option>
+                            <option value="physics" {% if request.args.get('subject') == 'physics' %}selected{% endif %}>Physics</option>
+                            <option value="chemistry" {% if request.args.get('subject') == 'chemistry' %}selected{% endif %}>Chemistry</option>
+                            <option value="biology" {% if request.args.get('subject') == 'biology' %}selected{% endif %}>Biology</option>
+                            <option value="tamil" {% if request.args.get('subject') == 'tamil' %}selected{% endif %}>Tamil</option>
+                            <option value="english" {% if request.args.get('subject') == 'english' %}selected{% endif %}>English</option>
+                            <option value="science" {% if request.args.get('subject') == 'science' %}selected{% endif %}>Science</option>
+                            <option value="social" {% if request.args.get('subject') == 'social' %}selected{% endif %}>Social Science</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Exam Type</label>
+                        <select name="exam_type" class="form-select">
+                            <option value="">All Types</option>
+                            <option value="public" {% if request.args.get('exam_type') == 'public' %}selected{% endif %}>Public Exam</option>
+                            <option value="supplementary" {% if request.args.get('exam_type') == 'supplementary' %}selected{% endif %}>Supplementary</option>
+                            <option value="revision" {% if request.args.get('exam_type') == 'revision' %}selected{% endif %}>Revision</option>
+                            <option value="model" {% if request.args.get('exam_type') == 'model' %}selected{% endif %}>Model Paper</option>
+                        </select>
+                    </div>
+                    <div class="col-12 text-center mt-4">
+                        <button class="btn btn-primary px-5 fw-bold shadow-sm" type="submit">
+                            <i class="fas fa-search me-2"></i>Apply Filters
                         </button>
                     </div>
                 </form>

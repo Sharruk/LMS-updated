@@ -20,21 +20,12 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}#classes">Classes</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('search') }}">Search</a></li>
                 </ul>
-                <form class="d-flex me-3" action="{{ url_for('search') }}" method="GET">
+                <form class="d-flex" action="{{ url_for('search') }}" method="GET">
                     <input class="form-control me-2" type="search" name="q" placeholder="Search subjects, years..." aria-label="Search">
                     <button class="btn btn-outline-primary" type="submit">Search</button>
                 </form>
-                <ul class="navbar-nav">
-                    {% if session.get('is_admin') %}
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('admin_dashboard') }}">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link text-danger" href="{{ url_for('admin_logout') }}">Logout</a></li>
-                    {% else %}
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('admin_login') }}">Admin</a></li>
-                    {% endif %}
-                </ul>
             </div>
         </div>
     </nav>
@@ -53,9 +44,18 @@
         {% block content %}{% endblock %}
     </main>
 
-    <footer class="bg-light py-4 mt-auto">
+    <footer class="bg-dark text-white py-5 mt-auto">
         <div class="container text-center">
-            <p class="text-muted">&copy; 2026 Tamil Nadu State Board – Question Papers & Answer Keys Portal</p>
+            <div class="row mb-4">
+                <div class="col-md-6 mx-auto">
+                    <h5 class="fw-bold mb-3">Follow our YouTube Channel – HUNGRY LEARNER</h5>
+                    <a href="https://www.youtube.com/@Hungry_Learner_Forever" target="_blank" class="btn btn-danger btn-lg px-4 fw-bold">
+                        <i class="fab fa-youtube me-2"></i>Subscribe on YouTube
+                    </a>
+                </div>
+            </div>
+            <hr class="bg-light opacity-25">
+            <p class="text-white-50 small mb-0">&copy; 2026 Tamil Nadu State Board – StudyHub Question Papers & Answer Keys Portal</p>
         </div>
     </footer>
 
