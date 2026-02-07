@@ -24,3 +24,14 @@ flask
 flask-sqlalchemy
 gunicorn
 psycopg2-binary
+email-validator
+flask
+flask-sqlalchemy
+gunicorn
+matplotlib
+numpy
+openai
+Pillow
+psycopg2-binary
+sqlalchemy
+werkzeug
