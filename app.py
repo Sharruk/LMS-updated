@@ -373,9 +373,30 @@ def vote(file_id):
     db.session.commit()
     return jsonify({'success': True, 'likes': file_item.likes, 'dislikes': file_item.dislikes})
 
-@app.route('/search')
+@app.route("/search")
 def search():
-    return render_template('search.html')
+    query = request.args.get("q", "").strip().lower()
+    data = load_data()
+    all_files = data.get('files', [])
+    
+    if not query:
+        return render_template('search.html', all_files=all_files, query="")
+
+    filtered_files = []
+    for f in all_files:
+        # Search by: Subject name, Class, Year, File title
+        subject_name = str(f.get('subject_name', '')).lower()
+        class_level = f"class {f.get('class_level', '')}".lower()
+        year = str(f.get('year', '')).lower()
+        title = str(f.get('custom_filename', '')).lower()
+        
+        if (query in subject_name or 
+            query in class_level or 
+            query in year or 
+            query in title):
+            filtered_files.append(f)
+            
+    return render_template('search.html', all_files=filtered_files, query=query)
 
 @app.route('/file/<int:file_id>')
 def file_detail(file_id):

@@ -1,605 +1,79 @@
 {% extends "base.html" %}
 
-{% block title %}Search Files - College Materials & PYQs Portal{% endblock %}
-
-{% block breadcrumb %}
-<nav aria-label="breadcrumb" class="bg-light py-2">
-    <div class="container">
-        <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item">
-                <a href="{{ url_for('index') }}"><i class="fas fa-home me-1"></i>Home</a>
-            </li>
-            <li class="breadcrumb-item">
-                <a href="{{ url_for('materials_home') }}">Question Papers</a>
-            </li>
-            <li class="breadcrumb-item active">Search Files</li>
-        </ol>
-    </div>
-</nav>
-{% endblock %}
+{% block title %}Search Results - StudyHub{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="display-6">
-                <i class="fas fa-search text-primary me-3"></i>
-                Search Files
-            </h1>
-        </div>
-    </div>
-</div>
-
-<!-- Search Interface -->
 <div class="row mb-4">
     <div class="col-12">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <!-- Basic Search Bar -->
-                <div class="mb-3">
-                    <label for="basicSearch" class="form-label">
-                        <i class="fas fa-search me-2"></i>Search by Subject Name or Code
-                    </label>
-                    <input type="text" class="form-control form-control-lg" id="basicSearch" 
-                           placeholder="Type to search for subjects, codes, or filenames...">
-                </div>
-
-                <!-- Smart Search Toggle -->
-                <div class="d-flex align-items-center mb-3">
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" id="smartSearchToggle">
-                        <label class="form-check-label fw-bold" for="smartSearchToggle">
-                            <i class="fas fa-filter me-2"></i>Enable Smart Search (Advanced Filters)
-                        </label>
+        <div class="card shadow-sm border-0" style="border-radius: 1rem; background: #f8f9fa;">
+            <div class="card-body p-4 text-center">
+                <h1 class="h3 fw-bold mb-3">Search Results</h1>
+                <p class="text-muted">Showing results for: <span class="fw-bold text-primary">"{{ query if query else 'All Files' }}"</span></p>
+                <form action="{{ url_for('search') }}" method="GET" class="mx-auto" style="max-width: 600px;">
+                    <div class="input-group input-group-lg">
+                        <input type="text" name="q" class="form-control border-0 shadow-none" placeholder="Search by subject, class, year..." value="{{ query }}">
+                        <button class="btn btn-primary px-4" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
                     </div>
-                </div>
-
-                <!-- Advanced Filters (Hidden by default) -->
-                <div id="advancedFilters" class="border-top pt-3" style="display: none;">
-                    <div class="row g-3">
-                        <div class="col-md-3">
-                            <label for="filterCourseType" class="form-label">Course Type</label>
-                            <select class="form-select" id="filterCourseType">
-                                <option value="">All Course Types</option>
-                                <option value="UG">UG (Under Graduate)</option>
-                                <option value="PG">PG (Post Graduate)</option>
-                                <option value="MBA">MBA</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="filterDepartment" class="form-label">Department</label>
-                            <select class="form-select" id="filterDepartment">
-                                <option value="">All Departments</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="filterSemester" class="form-label">Semester</label>
-                            <select class="form-select" id="filterSemester">
-                                <option value="">All Semesters</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="filterCategory" class="form-label">Category</label>
-                            <select class="form-select" id="filterCategory">
-                                <option value="">All Categories</option>
-                                <option value="CAT">CAT</option>
-                                <option value="ESE">ESE</option>
-                                <option value="SAT">SAT</option>
-                                <option value="Practical">Practical</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row mt-3">
-                        <div class="col-12">
-                            <button type="button" class="btn btn-outline-secondary" id="clearFilters">
-                                <i class="fas fa-undo me-2"></i>Clear All Filters
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                </form>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Search Results Counter -->
-<div class="row mb-3">
-    <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center">
-            <div id="resultsCounter" class="text-muted">
-                <i class="fas fa-file me-1"></i>
-                <span id="resultsCount">{{ all_files|length }}</span> files found
-            </div>
-            <div class="btn-group" role="group">
-                <button type="button" class="btn btn-outline-secondary active" id="tableViewBtn">
-                    <i class="fas fa-table me-1"></i>Table View
-                </button>
-                <button type="button" class="btn btn-outline-secondary" id="cardViewBtn">
-                    <i class="fas fa-th-large me-1"></i>Card View
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Search Results -->
-<div id="searchResults">
+<div class="row g-4">
     {% if all_files %}
-    <!-- Table View -->
-    <div id="tableView" class="table-responsive">
-        <table class="table table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th><i class="fas fa-file me-1"></i>File Name</th>
-                    <th><i class="fas fa-book me-1"></i>Subject</th>
-                    <th><i class="fas fa-graduation-cap me-1"></i>Course</th>
-                    <th><i class="fas fa-building me-1"></i>Department</th>
-                    <th><i class="fas fa-calendar me-1"></i>Semester</th>
-                    <th><i class="fas fa-tag me-1"></i>Category</th>
-                    <th><i class="fas fa-hdd me-1"></i>Size</th>
-                    <th><i class="fas fa-cog me-1"></i>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="searchTableBody">
-                {% for file in all_files %}
-                <tr class="search-result-row" 
-                    data-subject="{{ file.subject|lower }}"
-                    data-filename="{{ file.custom_filename|lower }}"
-                    data-course-type="{{ file.course_type|upper }}"
-                    data-department="{{ file.department|lower }}"
-                    data-semester="{{ file.semester }}"
-                    data-category="{{ file.category|upper }}">
-                    <td>
-                        <i class="fas fa-file-pdf text-danger me-2"></i>
-                        {{ file.custom_filename }}
-                    </td>
-                    <td>{{ file.subject }}</td>
-                    <td>
-                        <span class="badge bg-{{ 'primary' if file.course_type|upper == 'UG' else 'success' if file.course_type|upper == 'PG' else 'warning' }}">
-                            {{ file.course_type|upper }}
-                        </span>
-                    </td>
-                    <td>{{ file.department|upper }}</td>
-                    <td>{{ file.semester }}</td>
-                    <td>
-                        <span class="badge bg-secondary">{{ file.category }}</span>
-                    </td>
-                    <td>{{ file.size }}</td>
-                    <td>
-                        <div class="btn-group btn-group-sm">
-                            <a href="{{ url_for('download', file_id=file.id) }}" 
-                               class="btn btn-outline-success" title="Download">
-                                <i class="fas fa-download"></i>
-                            </a>
-                            <a href="{{ url_for('category_view', 
-                                        course_type_id=file.course_type, 
-                                        dept_id=file.department, 
-                                        semester_id=file.semester, 
-                                        category=file.category) }}" 
-                               class="btn btn-outline-primary" title="View Category">
-                                <i class="fas fa-folder-open"></i>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Card View -->
-    <div id="cardView" class="row g-3" style="display: none;">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <p class="mb-0 text-muted"><i class="fas fa-file-alt me-2"></i>Found {{ all_files|length }} materials</p>
+            </div>
+        </div>
         {% for file in all_files %}
-        <div class="col-md-6 col-lg-4 search-result-card" 
-             data-subject="{{ file.subject|lower }}"
-             data-filename="{{ file.custom_filename|lower }}"
-             data-course-type="{{ file.course_type|upper }}"
-             data-department="{{ file.department|lower }}"
-             data-semester="{{ file.semester }}"
-             data-category="{{ file.category|upper }}">
-            <div class="card h-100 file-card">
-                <div class="card-body">
-                    <div class="d-flex align-items-start mb-2">
-                        <i class="fas fa-file-pdf text-danger fa-2x me-3"></i>
-                        <div class="flex-grow-1">
-                            <h6 class="card-title mb-1">{{ file.custom_filename }}</h6>
-                            <p class="card-text small text-muted mb-1">
-                                <i class="fas fa-book me-1"></i>{{ file.subject }}
-                            </p>
-                            <p class="card-text small mb-1">
-                                <span class="badge bg-{{ 'primary' if file.course_type|upper == 'UG' else 'success' if file.course_type|upper == 'PG' else 'warning' }} me-1">
-                                    {{ file.course_type|upper }}
-                                </span>
-                                <span class="badge bg-secondary me-1">{{ file.category }}</span>
-                            </p>
-                            <p class="card-text small text-muted mb-1">
-                                <i class="fas fa-building me-1"></i>{{ file.department|upper }} - Sem {{ file.semester }}
-                            </p>
-                            <p class="card-text small text-muted">
-                                <i class="fas fa-hdd me-1"></i>{{ file.size }}
-                            </p>
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-0 shadow-sm transition-hover" style="border-radius: 1rem;">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="flex-shrink-0 bg-primary bg-opacity-10 rounded p-3 me-3">
+                            <i class="fas fa-file-pdf fa-2x text-primary"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title fw-bold mb-1">{{ file.custom_filename }}</h5>
+                            <span class="badge bg-light text-primary border border-primary border-opacity-25">Class {{ file.class_level }}</span>
+                            <span class="badge bg-light text-secondary border border-secondary border-opacity-25">{{ file.year }}</span>
                         </div>
                     </div>
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a href="{{ url_for('download', file_id=file.id) }}" 
-                           class="btn btn-success btn-sm">
-                            <i class="fas fa-download me-1"></i>Download
-                        </a>
-                        <a href="{{ url_for('category_view', 
-                                    course_type_id=file.course_type, 
-                                    dept_id=file.department, 
-                                    semester_id=file.semester, 
-                                    category=file.category) }}" 
-                           class="btn btn-outline-primary btn-sm">
-                            <i class="fas fa-folder-open me-1"></i>View
-                        </a>
+                    <p class="text-muted small mb-3">
+                        <i class="fas fa-book me-2"></i>{{ file.subject_name }}<br>
+                        <i class="fas fa-tag me-2"></i>{{ file.exam_type }}
+                    </p>
+                    <div class="d-flex gap-2">
+                        <a href="{{ url_for('file_detail', file_id=file.id) }}" class="btn btn-outline-primary btn-sm flex-grow-1 fw-bold">View Details</a>
+                        <a href="{{ url_for('download_file', file_id=file.id) }}" class="btn btn-primary btn-sm px-3"><i class="fas fa-download"></i></a>
                     </div>
                 </div>
             </div>
         </div>
         {% endfor %}
-    </div>
-
     {% else %}
-    <div class="text-center py-5">
-        <i class="fas fa-search fa-5x text-muted mb-3"></i>
-        <h3 class="text-muted">No Files Available</h3>
-        <p class="text-muted">Start by uploading some files to see search results!</p>
-        <a href="{{ url_for('upload') }}" class="btn btn-primary">
-            <i class="fas fa-plus me-2"></i>Upload Files
-        </a>
-    </div>
+        <div class="col-12 text-center py-5">
+            <div class="mb-4">
+                <i class="fas fa-search fa-4x text-muted opacity-25"></i>
+            </div>
+            <h3 class="fw-bold">No results found</h3>
+            <p class="text-muted">Try searching for something else like "Mathematics", "Class 10", or "2024".</p>
+            <a href="{{ url_for('index') }}" class="btn btn-primary px-4 mt-2">Back to Home</a>
+        </div>
     {% endif %}
 </div>
 
-<!-- No Results Message (Hidden by default) -->
-<div id="noResults" class="text-center py-5" style="display: none;">
-    <i class="fas fa-search fa-5x text-muted mb-3"></i>
-    <h3 class="text-muted">No Results Found</h3>
-    <p class="text-muted">Try adjusting your search terms or filters.</p>
-    <button type="button" class="btn btn-outline-primary" id="clearSearchBtn">
-        <i class="fas fa-undo me-2"></i>Clear Search
-    </button>
-</div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-// Department data mapping
-const departmentData = {
-    UG: ["CSE", "MECH", "EEE", "ECE", "IT", "CHEM", "CIVIL"],
-    PG: ["M.Tech CSE (5-Year)", "M.E Applied Electronics", "M.E Structural", "M.E PED"],
-    MBA: ["General MBA"]
-};
-
-// Semester data mapping
-const semesterData = {
-    UG: ["1", "2", "3", "4", "5", "6", "7", "8"],
-    PG: ["1", "2", "3", "4"],
-    MBA: ["1", "2", "3", "4"]
-};
-
-document.addEventListener('DOMContentLoaded', function() {
-    initializeSearch();
-    initializeViewToggle();
-    initializeSmartFilters();
-});
-
-function initializeSearch() {
-    const basicSearch = document.getElementById('basicSearch');
-    const smartToggle = document.getElementById('smartSearchToggle');
-    const advancedFilters = document.getElementById('advancedFilters');
-    
-    // Basic search functionality
-    basicSearch.addEventListener('input', debounce(performSearch, 300));
-    
-    // Smart search toggle
-    smartToggle.addEventListener('change', function() {
-        if (this.checked) {
-            advancedFilters.style.display = 'block';
-            populateFilterDropdowns();
-        } else {
-            advancedFilters.style.display = 'none';
-            clearAdvancedFilters();
-        }
-    });
-    
-    // Advanced filter changes
-    ['filterCourseType', 'filterDepartment', 'filterSemester', 'filterCategory'].forEach(id => {
-        const element = document.getElementById(id);
-        if (element) {
-            element.addEventListener('change', performSearch);
-        }
-    });
-    
-    // Clear filters button
-    const clearFiltersBtn = document.getElementById('clearFilters');
-    if (clearFiltersBtn) {
-        clearFiltersBtn.addEventListener('click', clearAllFilters);
-    }
-    
-    // Clear search button
-    const clearSearchBtn = document.getElementById('clearSearchBtn');
-    if (clearSearchBtn) {
-        clearSearchBtn.addEventListener('click', clearAllFilters);
-    }
-}
-
-function initializeViewToggle() {
-    const tableViewBtn = document.getElementById('tableViewBtn');
-    const cardViewBtn = document.getElementById('cardViewBtn');
-    const tableView = document.getElementById('tableView');
-    const cardView = document.getElementById('cardView');
-    
-    tableViewBtn.addEventListener('click', function() {
-        tableView.style.display = 'block';
-        cardView.style.display = 'none';
-        this.classList.add('active');
-        cardViewBtn.classList.remove('active');
-    });
-    
-    cardViewBtn.addEventListener('click', function() {
-        tableView.style.display = 'none';
-        cardView.style.display = 'block';
-        this.classList.add('active');
-        tableViewBtn.classList.remove('active');
-    });
-}
-
-function initializeSmartFilters() {
-    const courseTypeFilter = document.getElementById('filterCourseType');
-    if (courseTypeFilter) {
-        courseTypeFilter.addEventListener('change', function() {
-            updateDepartmentFilter(this.value);
-            updateSemesterFilter(this.value);
-        });
-    }
-}
-
-function populateFilterDropdowns() {
-    // Populate department filter with all departments
-    const departmentFilter = document.getElementById('filterDepartment');
-    if (departmentFilter) {
-        const allDepartments = [...departmentData.UG, ...departmentData.PG, ...departmentData.MBA];
-        departmentFilter.innerHTML = '<option value="">All Departments</option>';
-        [...new Set(allDepartments)].forEach(dept => {
-            const option = document.createElement('option');
-            option.value = dept;
-            option.textContent = dept;
-            departmentFilter.appendChild(option);
-        });
-    }
-    
-    // Populate semester filter with all semesters
-    const semesterFilter = document.getElementById('filterSemester');
-    if (semesterFilter) {
-        const allSemesters = [...semesterData.UG, ...semesterData.PG, ...semesterData.MBA];
-        semesterFilter.innerHTML = '<option value="">All Semesters</option>';
-        [...new Set(allSemesters)].forEach(sem => {
-            const option = document.createElement('option');
-            option.value = sem;
-            option.textContent = `Semester ${sem}`;
-            semesterFilter.appendChild(option);
-        });
-    }
-}
-
-function updateDepartmentFilter(courseType) {
-    const departmentFilter = document.getElementById('filterDepartment');
-    if (!departmentFilter) return;
-    
-    const currentValue = departmentFilter.value;
-    departmentFilter.innerHTML = '<option value="">All Departments</option>';
-    
-    if (courseType && departmentData[courseType]) {
-        departmentData[courseType].forEach(dept => {
-            const option = document.createElement('option');
-            option.value = dept;
-            option.textContent = dept;
-            departmentFilter.appendChild(option);
-        });
-    } else {
-        // Show all departments if no course type selected
-        const allDepartments = [...departmentData.UG, ...departmentData.PG, ...departmentData.MBA];
-        [...new Set(allDepartments)].forEach(dept => {
-            const option = document.createElement('option');
-            option.value = dept;
-            option.textContent = dept;
-            departmentFilter.appendChild(option);
-        });
-    }
-    
-    // Restore value if still valid
-    if (currentValue && [...departmentFilter.options].some(opt => opt.value === currentValue)) {
-        departmentFilter.value = currentValue;
-    }
-}
-
-function updateSemesterFilter(courseType) {
-    const semesterFilter = document.getElementById('filterSemester');
-    if (!semesterFilter) return;
-    
-    const currentValue = semesterFilter.value;
-    semesterFilter.innerHTML = '<option value="">All Semesters</option>';
-    
-    if (courseType && semesterData[courseType]) {
-        semesterData[courseType].forEach(sem => {
-            const option = document.createElement('option');
-            option.value = sem;
-            option.textContent = `Semester ${sem}`;
-            semesterFilter.appendChild(option);
-        });
-    } else {
-        // Show all semesters if no course type selected
-        const allSemesters = [...semesterData.UG, ...semesterData.PG, ...semesterData.MBA];
-        [...new Set(allSemesters)].forEach(sem => {
-            const option = document.createElement('option');
-            option.value = sem;
-            option.textContent = `Semester ${sem}`;
-            semesterFilter.appendChild(option);
-        });
-    }
-    
-    // Restore value if still valid
-    if (currentValue && [...semesterFilter.options].some(opt => opt.value === currentValue)) {
-        semesterFilter.value = currentValue;
-    }
-}
-
-function performSearch() {
-    const basicSearchTerm = document.getElementById('basicSearch').value.toLowerCase();
-    const smartSearchEnabled = document.getElementById('smartSearchToggle').checked;
-    
-    let filters = {};
-    if (smartSearchEnabled) {
-        filters = {
-            courseType: document.getElementById('filterCourseType').value,
-            department: document.getElementById('filterDepartment').value.toLowerCase(),
-            semester: document.getElementById('filterSemester').value,
-            category: document.getElementById('filterCategory').value
-        };
-    }
-    
-    const tableRows = document.querySelectorAll('.search-result-row');
-    const cardItems = document.querySelectorAll('.search-result-card');
-    let visibleCount = 0;
-    
-    // Filter table rows
-    tableRows.forEach(row => {
-        const isVisible = matchesSearchCriteria(row, basicSearchTerm, filters, smartSearchEnabled);
-        row.style.display = isVisible ? '' : 'none';
-        if (isVisible) visibleCount++;
-    });
-    
-    // Filter card items
-    cardItems.forEach(card => {
-        const isVisible = matchesSearchCriteria(card, basicSearchTerm, filters, smartSearchEnabled);
-        card.style.display = isVisible ? '' : 'none';
-    });
-    
-    // Update results counter
-    updateResultsCounter(visibleCount);
-    
-    // Show/hide no results message
-    const searchResults = document.getElementById('searchResults');
-    const noResults = document.getElementById('noResults');
-    
-    if (visibleCount === 0) {
-        searchResults.style.display = 'none';
-        noResults.style.display = 'block';
-    } else {
-        searchResults.style.display = 'block';
-        noResults.style.display = 'none';
-    }
-}
-
-function matchesSearchCriteria(element, searchTerm, filters, smartSearchEnabled) {
-    const subject = element.getAttribute('data-subject') || '';
-    const filename = element.getAttribute('data-filename') || '';
-    const courseType = element.getAttribute('data-course-type') || '';
-    const department = element.getAttribute('data-department') || '';
-    const semester = element.getAttribute('data-semester') || '';
-    const category = element.getAttribute('data-category') || '';
-    
-    // Basic search check
-    const matchesBasicSearch = !searchTerm || 
-        subject.includes(searchTerm) || 
-        filename.includes(searchTerm);
-    
-    if (!smartSearchEnabled) {
-        return matchesBasicSearch;
-    }
-    
-    // Advanced filters check
-    const matchesFilters = 
-        (!filters.courseType || courseType === filters.courseType) &&
-        (!filters.department || department === filters.department) &&
-        (!filters.semester || semester === filters.semester) &&
-        (!filters.category || category === filters.category);
-    
-    return matchesBasicSearch && matchesFilters;
-}
-
-function updateResultsCounter(count) {
-    const resultsCount = document.getElementById('resultsCount');
-    if (resultsCount) {
-        resultsCount.textContent = count;
-    }
-}
-
-function clearAdvancedFilters() {
-    ['filterCourseType', 'filterDepartment', 'filterSemester', 'filterCategory'].forEach(id => {
-        const element = document.getElementById(id);
-        if (element) {
-            element.value = '';
-        }
-    });
-}
-
-function clearAllFilters() {
-    document.getElementById('basicSearch').value = '';
-    document.getElementById('smartSearchToggle').checked = false;
-    document.getElementById('advancedFilters').style.display = 'none';
-    clearAdvancedFilters();
-    performSearch();
-}
-
-// Debounce function for search input
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-    };
-}
-</script>
-
 <style>
-.file-card {
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+.transition-hover {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-
-.file-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.form-check-input:checked {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
-}
-
-.table-responsive {
-    border-radius: 0.375rem;
-    overflow: hidden;
-}
-
-.search-result-row:hover {
-    background-color: #f8f9fa;
-}
-
-.badge {
-    font-size: 0.75rem;
-}
-
-@media (max-width: 768px) {
-    .btn-group {
-        flex-direction: column;
-        width: 100%;
-    }
-    
-    .btn-group .btn {
-        border-radius: 0.375rem !important;
-        margin-bottom: 0.25rem;
-    }
-    
-    .table-responsive {
-        font-size: 0.875rem;
-    }
+.transition-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,.1)!important;
 }
 </style>
 {% endblock %}
