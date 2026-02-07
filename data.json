@@ -1,0 +1,32 @@
+{
+  "classes": {
+    "9": {
+      "name": "Class 9",
+      "subjects": {}
+    },
+    "10": {
+      "name": "Class 10",
+      "subjects": {}
+    },
+    "11": {
+      "name": "Class 11",
+      "subjects": {}
+    },
+    "12": {
+      "name": "Class 12",
+      "subjects": {}
+    }
+  },
+  "exam_types": [
+    "Unit Test 1",
+    "Unit Test 2",
+    "Unit Test 3",
+    "Quarterly Exam",
+    "Half Yearly Exam",
+    "Revision Test",
+    "Model Practical",
+    "Practical Exam",
+    "Annual Exam"
+  ],
+  "files": []
+}
