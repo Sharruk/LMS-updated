@@ -26,10 +26,10 @@
                         </div>
                         <div class="col-md-6">
                             <label for="subject" class="form-label fw-semibold">Subject</label>
-                            <select name="subject" id="subject" class="form-select" required>
+                            <select name="subject" id="subject" class="form-select" required disabled>
                                 <option value="">Select Subject</option>
                                 {% for subject in subjects %}
-                                <option value="{{ subject.id }}" data-class="{{ subject.class_level }}">{{ subject.name }} (Class {{ subject.class_level }})</option>
+                                <option value="{{ subject.id }}" data-class="{{ subject.class_level }}">{{ subject.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -82,15 +82,27 @@ document.getElementById('class').addEventListener('change', function() {
     const subjectSelect = document.getElementById('subject');
     const options = subjectSelect.querySelectorAll('option');
     
-    options.forEach(option => {
-        if (option.value === "") {
-            option.style.display = 'block';
-        } else if (option.getAttribute('data-class') === classLevel) {
-            option.style.display = 'block';
-        } else {
-            option.style.display = 'none';
-        }
-    });
+    if (classLevel) {
+        subjectSelect.disabled = false;
+        let visibleCount = 0;
+        options.forEach(option => {
+            if (option.value === "") {
+                option.style.display = 'block';
+            } else if (option.getAttribute('data-class') === classLevel) {
+                option.style.display = 'block';
+                visibleCount++;
+            } else {
+                option.style.display = 'none';
+            }
+        });
+    } else {
+        subjectSelect.disabled = true;
+        options.forEach(option => {
+            if (option.value !== "") {
+                option.style.display = 'none';
+            }
+        });
+    }
     subjectSelect.value = "";
 });
 

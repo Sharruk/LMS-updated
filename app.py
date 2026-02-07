@@ -148,6 +148,27 @@ def admin_dashboard():
         return redirect(url_for('index'))
     return render_template('admin/dashboard.html')
 
+@app.route('/admin/comments')
+def admin_comments():
+    if not is_admin():
+        return redirect(url_for('index'))
+    comments = Comment.query.order_by(Comment.created_at.desc()).all()
+    return render_template('admin/comments.html', comments=comments)
+
+@app.route('/admin/delete-comment/<int:comment_id>', methods=['POST'])
+def delete_comment(comment_id):
+    if not is_admin():
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 403
+    comment = Comment.query.get_or_404(comment_id)
+    try:
+        db.session.delete(comment)
+        db.session.commit()
+        flash('Comment deleted successfully', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting comment: {str(e)}', 'error')
+    return redirect(url_for('admin_comments'))
+
 @app.route('/admin/logout')
 def admin_logout():
     session.pop('is_admin', None)
