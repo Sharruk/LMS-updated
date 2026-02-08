@@ -1,144 +1,57 @@
 {% extends "base.html" %}
 
-{% block title %}Upload Files - School Portal{% endblock %}
-
 {% block content %}
 <div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-        <div class="card shadow">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
             <div class="card-header bg-primary text-white">
-                <h4 class="mb-0">
-                    <i class="fas fa-cloud-upload-alt me-2"></i>Upload Files
-                </h4>
+                <h4 class="mb-0"><i class="fas fa-upload me-2"></i>Upload Question Paper / Answer Key</h4>
             </div>
-            <div class="card-body">
-                <form action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label for="class" class="form-label fw-semibold">Class</label>
-                            <select name="class" id="class" class="form-select" required>
-                                <option value="">Select Class</option>
-                                <option value="9">Class 9</option>
-                                <option value="10">Class 10</option>
-                                <option value="11">Class 11</option>
-                                <option value="12">Class 12</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="subject" class="form-label fw-semibold">Subject</label>
-                            <select name="subject" id="subject" class="form-select" required disabled>
-                                <option value="">Select Subject</option>
-                                {% for subject in subjects %}
-                                <option value="{{ subject.id }}" data-class="{{ subject.class_level }}">{{ subject.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="exam_type" class="form-label fw-semibold">Exam Type</label>
-                            <select name="exam_type" id="exam_type" class="form-select" required>
-                                <option value="">Select Exam Type</option>
-                                {% for type in exam_types %}
-                                <option value="{{ type }}">{{ type }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="year" class="form-label fw-semibold">Year</label>
-                            <input type="text" name="year" id="year" class="form-control" placeholder="e.g. 2024" required>
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label fw-semibold">File Upload</label>
-                            <div id="drop-zone" class="border border-primary border-2 border-dashed rounded-3 p-4 text-center bg-light" style="cursor: pointer;">
-                                <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-2"></i>
-                                <p class="mb-1">Drag & Drop files here or click to browse</p>
-                                <p class="text-muted small">Supports PDF, Images, Word, Excel, PPT, etc.</p>
-                                <input type="file" name="file" id="file" class="d-none" required>
-                                <div id="file-info" class="mt-2 fw-bold text-success d-none"></div>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <label for="custom_filename" class="form-label fw-semibold">Custom Filename (Optional)</label>
-                            <input type="text" name="custom_filename" id="custom_filename" class="form-control" placeholder="e.g. Mathematics Question Paper 2024">
-                        </div>
-                        <div class="col-12">
-                            <label for="description" class="form-label fw-semibold">Description (Optional)</label>
-                            <textarea name="description" id="description" class="form-control" rows="3"></textarea>
-                        </div>
-                        <div class="col-12 mt-4">
-                            <button type="submit" class="btn btn-primary w-100 py-2">
-                                <i class="fas fa-upload me-2"></i>Upload File
-                            </button>
-                        </div>
+            <div class="card-body p-4">
+                <form action="{{ url_for('upload_file') }}" method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label">Class</label>
+                        <select name="class_level" class="form-select" required>
+                            <option value="">Select Class</option>
+                            <option value="9">Class 9</option>
+                            <option value="10">Class 10</option>
+                            <option value="11">Class 11</option>
+                            <option value="12">Class 12</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Subject Name</label>
+                        <input type="text" name="subject_name" class="form-control" placeholder="e.g. Tamil, Mathematics" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Exam Type</label>
+                        <select name="exam_type" class="form-select" required>
+                            <option value="">Select Exam Type</option>
+                            {% for type in exam_types %}
+                            <option value="{{ type }}">{{ type }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Year</label>
+                        <input type="number" name="year" class="form-control" placeholder="2026" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Select PDF File</label>
+                        <input type="file" name="file" class="form-control" accept=".pdf" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description (Optional)</label>
+                        <textarea name="description" class="form-control" rows="2"></textarea>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-cloud-upload-alt me-2"></i>Upload Paper
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-document.getElementById('class').addEventListener('change', function() {
-    const classLevel = this.value;
-    const subjectSelect = document.getElementById('subject');
-    const options = subjectSelect.querySelectorAll('option');
-    
-    if (classLevel) {
-        subjectSelect.disabled = false;
-        let found = false;
-        options.forEach(option => {
-            if (option.value === "") {
-                option.style.display = 'block';
-            } else if (String(option.getAttribute('data-class')) === String(classLevel)) {
-                option.style.display = 'block';
-                found = true;
-            } else {
-                option.style.display = 'none';
-            }
-        });
-        if (!found) {
-            subjectSelect.disabled = true;
-        }
-    } else {
-        subjectSelect.disabled = true;
-        options.forEach(option => {
-            if (option.value !== "") {
-                option.style.display = 'none';
-            }
-        });
-    }
-    subjectSelect.value = "";
-});
-
-const dropZone = document.getElementById('drop-zone');
-const fileInput = document.getElementById('file');
-const fileInfo = document.getElementById('file-info');
-
-dropZone.onclick = () => fileInput.click();
-
-fileInput.onchange = (e) => {
-    if (fileInput.files.length > 0) {
-        fileInfo.textContent = "Selected: " + fileInput.files[0].name;
-        fileInfo.classList.remove('d-none');
-    }
-};
-
-dropZone.ondragover = (e) => {
-    e.preventDefault();
-    dropZone.classList.add('bg-primary', 'bg-opacity-10');
-};
-
-dropZone.ondragleave = () => {
-    dropZone.classList.remove('bg-primary', 'bg-opacity-10');
-};
-
-dropZone.ondrop = (e) => {
-    e.preventDefault();
-    dropZone.classList.remove('bg-primary', 'bg-opacity-10');
-    if (e.dataTransfer.files.length > 0) {
-        fileInput.files = e.dataTransfer.files;
-        fileInfo.textContent = "Selected: " + fileInput.files[0].name;
-        fileInfo.classList.remove('d-none');
-    }
-};
-</script>
 {% endblock %}
