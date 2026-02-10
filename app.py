@@ -108,8 +108,12 @@ def view_subject(class_id, subject_name):
 
 @app.route('/exams/<class_id>/<subject_name>/<exam_type>')
 def view_exams(class_id, subject_name, exam_type):
-    files = File.query.filter_by(class_level=class_id, subject_name=subject_name, exam_type=exam_type, visible=True).all()
-    return render_template('files_list.html', class_id=class_id, subject_name=subject_name, exam_type=exam_type, files=files)
+    try:
+        files = File.query.filter_by(class_level=class_id, subject_name=subject_name, exam_type=exam_type, visible=True).all()
+        return render_template('files_list.html', class_id=class_id, subject_name=subject_name, exam_type=exam_type, files=files)
+    except Exception as e:
+        app.logger.error(f"Error in view_exams: {e}")
+        return render_template('files_list.html', class_id=class_id, subject_name=subject_name, exam_type=exam_type, files=[])
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
