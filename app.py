@@ -102,7 +102,8 @@ def view_class(class_id):
     files = File.query.filter_by(class_level=class_id, visible=True).all()
     subjects = sorted(list(set([f.subject_name for f in files])))
     class_name = f"Class {class_id}"
-    return render_template('class_view.html', class_id=class_id, class_name=class_name, subjects=subjects)
+    class_data = {"id": class_id, "name": class_name}
+    return render_template('class_view.html', class_id=class_id, class_name=class_name, subjects=subjects, class_data=class_data)
 
 @app.route('/subject/<class_id>/<subject_name>')
 def view_subject(class_id, subject_name):
