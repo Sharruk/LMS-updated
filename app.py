@@ -26,7 +26,11 @@ db.init_app(app)
 # Configuration
 UPLOAD_FOLDER = 'uploads'
 DATA_FILE = 'data.json'
-ALLOWED_EXTENSIONS = {'pdf'}
+ALLOWED_EXTENSIONS = {'pdf', 'docx', 'doc', 'xls', 'xlsx', 'png', 'jpg', 'jpeg', 'gif'}
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -126,18 +130,21 @@ def upload_file():
         subject_name = request.form.get('subject_name')
         exam_type = request.form.get('exam_type')
         year = request.form.get('year')
+        custom_name = request.form.get('custom_filename')
         description = request.form.get('description')
         file = request.files.get('file')
 
-        if file and file.filename.endswith('.pdf'):
+        if file and allowed_file(file.filename):
             filename = secure_filename(f"{class_level}_{subject_name}_{exam_type}_{year}_{file.filename}")
             file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(file_path)
 
+            display_name = custom_name if custom_name else f"{subject_name} - {exam_type} ({year})"
+
             new_file = File(
                 filename=filename,
                 original_filename=file.filename,
-                custom_filename=f"{subject_name} - {exam_type} ({year})",
+                custom_filename=display_name,
                 class_level=class_level,
                 subject_name=subject_name,
                 exam_type=exam_type,
@@ -151,7 +158,7 @@ def upload_file():
             db.session.commit()
             flash('File uploaded successfully!', 'success')
             return redirect(url_for('admin_dashboard'))
-        flash('Invalid file. Please upload a PDF.', 'error')
+        flash('Invalid file. Allowed formats: PDF, DOCX, Images, XLS.', 'error')
 
     data = load_data()
     return render_template('upload.html', exam_types=data['exam_types'])
